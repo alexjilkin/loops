@@ -1,0 +1,27 @@
+{
+  "name": "loops",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexjilkin/looper.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alexjilkin/looper/issues"
+  },
+  "dependencies": {
+
+  },
+  "devDependencies": {
+
+  },
+  "private": true,
+  "workspaces": ["core", "web"],
+  "homepage": "https://github.com/alexjilkin/looper#readme"
+}
