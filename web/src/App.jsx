@@ -1,12 +1,13 @@
 import React, {useState} from 'react';
 import './App.scss'
-import {start, stop, getRecording, play} from '@loops/core'
+import {addRecording, subscribe} from '@loops/core'
+import Oscilloscope from './Oscilloscope'
 
 const App = () => {
-  const [isRecording, setIsRecording] = useState(false)
+  const [stopRecording, setStopRecording] = useState(null)
 
   const handleRecordingClick = () => {
-    if (!isRecording) {
+    if (!stopRecording) {
       startRecord()
     } else {
       stopRecord()
@@ -14,21 +15,21 @@ const App = () => {
   }
 
   const startRecord = () => {
-    start()
-    setIsRecording(true)
+    const callback = addRecording()
+    setStopRecording(() => callback)
   }
 
   const stopRecord = () => {
-    stop()
-    setIsRecording(false)
-    play()
+    stopRecording()
+    setStopRecording(undefined)
   }
 
   return (
     <div styleName="container">
-      <button onClick={handleRecordingClick}>
-        {isRecording ? 'Stop ' : 'Start '} Recording
+      <button onClick={handleRecordingClick} styleName={`button ${stopRecording ? 'stop' : ''}`}>
+        {stopRecording ? 'Stop ' : 'Start '}
       </button>
+      <Oscilloscope subscribe={subscribe} />
     </div>
   );
 }
