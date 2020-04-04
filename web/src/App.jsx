@@ -10,14 +10,11 @@ const loopsEngine = new Loops('browser');
 var lastInputId = localStorage.getItem('inputId');
 
 const App = () => {
-  const [stopRecording, _setStopRecording] = useState(null)
+  const [stopRecording, setStopRecording] = useState(null)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
-  const stopRecordingRef = useRef(stopRecording)
 
-  const setStopRecording = (value) => {
-    stopRecordingRef.current = value;
-    _setStopRecording(() => value);
-  }
+
+
   useEffect(() => {
     if (lastInputId) {
       loopsEngine.setInput(lastInputId)
@@ -27,20 +24,23 @@ const App = () => {
   }, [])
 
   const handleRecordingClick = useCallback(() => {
-    if (!stopRecordingRef.current) {
-      startRecord()
-    } else {
-      stopRecord()
-    }
+    setStopRecording(stopRecording => {
+      if (!stopRecording) {
+        startRecord()
+      } else {
+        stopRecord(stopRecording)
+      }
+    })
+    
   }, [stopRecording])
 
-  const startRecord = async () => {
+  const startRecord = useCallback(async () => {
     const callback = await loopsEngine.addRecording()
-    setStopRecording(callback)
-  }
+    setStopRecording(() => callback)
+  }, [stopRecording])
 
-  const stopRecord = async () => {
-    await stopRecordingRef.current()
+  const stopRecord = async (func) => {
+    await func()
     setStopRecording(undefined)
   }
 
