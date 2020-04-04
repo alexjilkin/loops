@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useEffect} from 'react';
+import React, {useState, useCallback, useEffect, useRef} from 'react';
 import './App.scss'
 import {Loops, subscribe} from '@loops/core'
 import Oscilloscope from './Oscilloscope'
@@ -10,31 +10,45 @@ const loopsEngine = new Loops('browser');
 var lastInputId = localStorage.getItem('inputId');
 
 const App = () => {
-  const [stopRecording, setStopRecording] = useState(null)
+  const [stopRecording, _setStopRecording] = useState(null)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const stopRecordingRef = useRef(stopRecording)
 
+  const setStopRecording = (value) => {
+    stopRecordingRef.current = value;
+    _setStopRecording(() => value);
+  }
   useEffect(() => {
     if (lastInputId) {
       loopsEngine.setInput(lastInputId)
     }
+
+    document.addEventListener('keydown', handleKeyboard)
   }, [])
+
   const handleRecordingClick = useCallback(() => {
-    if (!stopRecording) {
+    if (!stopRecordingRef.current) {
       startRecord()
     } else {
       stopRecord()
     }
   }, [stopRecording])
 
-  const startRecord = useCallback(async () => {
+  const startRecord = async () => {
     const callback = await loopsEngine.addRecording()
-    setStopRecording(() => callback)
-  })
+    setStopRecording(callback)
+  }
 
-  const stopRecord = useCallback(async () => {
-    await stopRecording()
+  const stopRecord = async () => {
+    await stopRecordingRef.current()
     setStopRecording(undefined)
-  })
+  }
+
+  const handleKeyboard = (e) => {
+    if(event.code === 'Space') {
+      handleRecordingClick()
+    }
+  }
 
   const handleSettingsClick = useCallback(() => {
     setIsSettingsOpen(!isSettingsOpen)
