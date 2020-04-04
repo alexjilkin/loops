@@ -15,17 +15,32 @@ $reset-shadow-color:  #8C2022;
 
 .container {
 	font-family: Impact;
-	padding: 5em;
+	padding: 4em;
 	display: flex;
 	flex-direction: column;
+
+	.output-wave {
+		width: 400px;
+	}
+
+	.settings {
+		position: absolute;
+		top: 4px;
+		left: 4px;
+		width: 1.5em;
+		height: 1.5em;
+		cursor: pointer;
+	}
+
 	.button {
 		background: $button-background;
 		position: relative;
 		width: 3em;
-		height: 3em;
+		height: 2.5em;
+		padding: 0.3em;
 		text-align: center;
-		font-size: 1.5em;
-		padding: 0.5em;
+		font-size: 1.3em;
+		cursor: pointer;
 		font-family: 'Press Start 2P';
 		text-decoration: none; 
 		color: white;

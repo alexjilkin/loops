@@ -2,13 +2,13 @@ import React, {useEffect, useRef} from 'react';
 
 const width = 400;
 const height = 200;
-const yUnit = height * 10;
+const yUnit = height ;
 
-let x = 0;
 let lastY = 0;
 
 const Oscilloscope = ({subscribe}) => {
     const canvasRef = useRef(null)
+    let x = useRef(0)
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -17,20 +17,24 @@ const Oscilloscope = ({subscribe}) => {
 
             const context = canvas.getContext('2d');
             subscribe((index, y) => {
-                const canvasWorldX = x % width;
+                if (Math.random() < 0.98) {
+                    return;
+                }
+                const canvasWorldX = x.current % width;
                 const canvasWorldY = (height * (3/5)) + (y * yUnit)
-                context.fillRect(canvasWorldX, canvasWorldY , 1, 1);
+                //context.fillRect(canvasWorldX, canvasWorldY , 1, 1);
 
                 if (canvasWorldX === 0) {
-                    context.clearRect(0, 0, width, height)
                     context.beginPath();
+                    lastY = 0;
                 }
+
+                context.clearRect(canvasWorldX + 1, 0, 1, height)
                 context.moveTo(canvasWorldX - 1, lastY);
                 context.lineTo(canvasWorldX, canvasWorldY);
                 context.stroke();
 
-
-                x++;
+                x.current = x.current + 1;
                 lastY = canvasWorldY;
             })
         }

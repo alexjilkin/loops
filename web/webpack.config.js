@@ -12,6 +12,17 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.(svg|png|jpg|gif)$/i,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 8192,
+            },
+          },
+        ],
+      },
+      {
         test: /\.(js|jsx)$/,
         include: path.resolve(__dirname, './src'),
         exclude: /node_modules/,

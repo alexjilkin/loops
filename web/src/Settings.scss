@@ -1,0 +1,14 @@
+.container {
+    display: flex;
+    flex-direction: column;
+
+    .inputs {
+        display: flex;
+        flex-direction: column;
+
+        .input {
+            cursor: pointer;
+            margin: 0.3em;
+        }
+    }
+}

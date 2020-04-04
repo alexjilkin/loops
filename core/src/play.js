@@ -6,7 +6,7 @@ const subscribers = []
 export const play = (loop) => {
     if (!master) {
         master = new AudioContext({sampleRate});
-    }
+    }   
 
     const buffer = master.createBuffer(1, bufferSize, sampleRate)
     const source = master.createScriptProcessor(bufferSize, 1, 1);
