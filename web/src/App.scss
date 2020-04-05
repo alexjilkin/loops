@@ -18,7 +18,19 @@ $reset-shadow-color:  #8C2022;
 	padding: 4em;
 	display: flex;
 	flex-direction: column;
-
+	
+	.taps {
+		display: flex;
+		margin-top: 1em;
+		.tap {
+			background-color: lightblue	;
+			width: 0.5em;
+			height: 0.5em;
+			margin: 0.1em;
+			border-radius: 50%;
+		}
+	}
+	
 	.output-wave {
 		width: 400px;
 	}
@@ -32,6 +44,9 @@ $reset-shadow-color:  #8C2022;
 		cursor: pointer;
 	}
 
+	.bpm {
+		margin-top: 1em;
+	}
 	.button {
 		background: $button-background;
 		position: relative;

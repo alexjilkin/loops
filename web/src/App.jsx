@@ -12,21 +12,28 @@ var lastInputId = localStorage.getItem('inputId');
 const App = () => {
   const [stopRecording, setStopRecording] = useState(null)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
-
-
+  const [bpm, setBpm] = useState(null)
+  const [taps, setTaps] = useState(0)
 
   useEffect(() => {
     if (lastInputId) {
       loopsEngine.setInput(lastInputId)
     }
-
     document.addEventListener('keydown', handleKeyboard)
+    document.addEventListener('keyup', () => {
+      document.addEventListener('keydown', handleKeyboard)
+    })
+
   }, [])
+
+  const handleTap = () => {
+    setTaps(previousTaps => previousTaps + 1)
+  }
 
   const handleRecordingClick = useCallback(() => {
     setStopRecording(stopRecording => {
       if (!stopRecording) {
-        startRecord()
+        loopsEngine.tap(handleTap, startRecord)
       } else {
         stopRecord(stopRecording)
       }
@@ -34,17 +41,19 @@ const App = () => {
     
   }, [stopRecording])
 
-  const startRecord = useCallback(async () => {
-    const callback = await loopsEngine.addRecording()
-    setStopRecording(() => callback)
+  const startRecord = useCallback(async (bpm) => {
+    setStopRecording(true)
+    setBpm(bpm)
   }, [stopRecording])
 
   const stopRecord = async (func) => {
-    await func()
-    setStopRecording(undefined)
+    loopsEngine.stop()
+    setStopRecording(false)
   }
 
   const handleKeyboard = (e) => {
+    document.removeEventListener('keyup', handleKeyboard)
+
     if(event.code === 'Space') {
       handleRecordingClick()
     }
@@ -68,9 +77,21 @@ const App = () => {
       {isSettingsOpen ? 
         <Settings getInputs={loopsEngine.getInputs} onInputSelect={handleInputChange} /> :
       <div>
-        <button onClick={handleRecordingClick} styleName={`button ${stopRecording ? 'stop' : ''}`}>
-          {stopRecording ? 'Stop ' : 'Start '}
+        
+        
+        <button onClick={handleRecordingClick} styleName={`button ${stopRecording ? 'stop' : ''}`}> 
+          {stopRecording ? 'Stop ' : 'Tap '}
         </button>
+        <div styleName="taps">
+          {
+            Array.from({length: taps}).map((v, i) => (
+              <div key={i} styleName="tap"></div>
+            )) 
+          }
+        </div>
+        <div styleName="bpm">
+          {bpm && `BPM: ${bpm}`}
+         </div>
         <div styleName="output-wave">
           <Oscilloscope subscribe={subscribe} />
         </div>
