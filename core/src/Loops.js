@@ -39,9 +39,14 @@ export default class Loops {
     console.log('init recording')
   }
 
+  subscribeToClick(onClick) {
+    this.onClick = onClick
+  }
+
   tap(onStartRecord, onStopRecord) {
     this.tapTimestamps.push(Date.now())
-
+    this.onClick();
+    
     if (this.isRecording) {
       this.stop()
       onStopRecord && onStopRecord()

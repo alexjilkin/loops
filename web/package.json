@@ -35,6 +35,7 @@
     "babel-preset-env": "^1.7.0",
     "babel-preset-stage-0": "^6.24.1",
     "css-loader": "^0.28.11",
+    "file-loader": "^6.0.0",
     "node-sass": "^4.12.0",
     "postcss": "^7.0.17",
     "postcss-import": "^12.0.1",

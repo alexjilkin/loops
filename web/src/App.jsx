@@ -3,7 +3,7 @@ import './App.scss'
 import {Loops, subscribe} from '@loops/core'
 import Oscilloscope from './Oscilloscope'
 import Settings from './Settings';
-
+import Click from './assets/korg-click.wav'
 import CogIcon from './assets/cog.svg'
 
 const loopsEngine = new Loops('browser');
@@ -14,11 +14,13 @@ const App = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [bpm, setBpm] = useState(null)
   const [taps, setTaps] = useState(0)
+  const clickAudioRef = useRef(null)
 
   useEffect(() => {
     if (lastInputId) {
       loopsEngine.setInput(lastInputId)
     }
+    loopsEngine.subscribeToClick(handleClick)
     document.addEventListener('keydown', handleKeyboard)
     document.addEventListener('keyup', () => {
       document.addEventListener('keydown', handleKeyboard)
@@ -26,14 +28,15 @@ const App = () => {
 
   }, [])
 
-  const handleTap = () => {
-    setTaps(previousTaps => previousTaps + 1)
-  }
-
   const handleRecordingClick = useCallback(() => {
     const tapsCount = loopsEngine.tap(startRecord, stopRecord)
     setTaps(tapsCount)
   })
+
+  const handleClick = () => {
+    clickAudioRef.current.currentTime = 0
+    clickAudioRef.current.play()
+  }
 
   const startRecord = useCallback(async (bpm) => {
     setIsRecording(true)
@@ -64,14 +67,14 @@ const App = () => {
 
   return (
     <div styleName="container">
+      <audio src={Click} ref={clickAudioRef}></audio>
       <div styleName="settings" onClick={handleSettingsClick}>
         <img src={CogIcon} />
       </div>
       {isSettingsOpen ? 
         <Settings getInputs={loopsEngine.getInputs} onInputSelect={handleInputChange} /> :
       <div>
-        
-        
+      
         <button onClick={handleRecordingClick} styleName={`button ${isRecording ? 'stop' : ''}`}> 
           {isRecording ? 'Stop ' : 'Tap '}
         </button>
