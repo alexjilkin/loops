@@ -10,7 +10,7 @@ const loopsEngine = new Loops('browser');
 var lastInputId = localStorage.getItem('inputId');
 
 const App = () => {
-  const [stopRecording, setStopRecording] = useState(null)
+  const [isRecording, setIsRecording] = useState(null)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [bpm, setBpm] = useState(null)
   const [taps, setTaps] = useState(0)
@@ -31,28 +31,21 @@ const App = () => {
   }
 
   const handleRecordingClick = useCallback(() => {
-    setStopRecording(stopRecording => {
-      if (!stopRecording) {
-        loopsEngine.tap(handleTap, startRecord)
-      } else {
-        stopRecord(stopRecording)
-      }
-    })
-    
-  }, [stopRecording])
+    const tapsCount = loopsEngine.tap(startRecord, stopRecord)
+    setTaps(tapsCount)
+  })
 
   const startRecord = useCallback(async (bpm) => {
-    setStopRecording(true)
+    setIsRecording(true)
     setBpm(bpm)
-  }, [stopRecording])
+  })
 
-  const stopRecord = async (func) => {
-    loopsEngine.stop()
-    setStopRecording(false)
+  const stopRecord = async () => {
+    setIsRecording(false)
   }
 
   const handleKeyboard = (e) => {
-    document.removeEventListener('keyup', handleKeyboard)
+    document.removeEventListener('keydown', handleKeyboard)
 
     if(event.code === 'Space') {
       handleRecordingClick()
@@ -79,8 +72,8 @@ const App = () => {
       <div>
         
         
-        <button onClick={handleRecordingClick} styleName={`button ${stopRecording ? 'stop' : ''}`}> 
-          {stopRecording ? 'Stop ' : 'Tap '}
+        <button onClick={handleRecordingClick} styleName={`button ${isRecording ? 'stop' : ''}`}> 
+          {isRecording ? 'Stop ' : 'Tap '}
         </button>
         <div styleName="taps">
           {

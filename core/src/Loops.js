@@ -12,7 +12,7 @@ export default class Loops {
     this.bpm = 0;
     this.bufferCount = 0;
     this.currentLoopIndex = 0;
-
+    this.isRecording = false;
     this.tap = this.tap.bind(this)
   }
 
@@ -30,6 +30,7 @@ export default class Loops {
       this.bufferCount++;
     };
 
+    this.isRecording = true;
     this.stopCallback = await getBrowserInput(handleBuffer)
   }
 
@@ -38,16 +39,22 @@ export default class Loops {
     console.log('init recording')
   }
 
-  tap(onTap, onStartRecord) {
+  tap(onStartRecord, onStopRecord) {
+    this.tapTimestamps.push(Date.now())
+
+    if (this.isRecording) {
+      this.stop()
+      onStopRecord && onStopRecord()
+      this.isRecording = false;
+      return 0;
+    }
+
     if (this.bpm) {
       this.startRecording()
       onStartRecord && onStartRecord(this.bpm)
-    }
 
-    this.tapTimestamps.push(Date.now())
-    onTap && onTap()
-
-    if (this.tapTimestamps.length === 4) {
+      return 0;
+    } else if (this.tapTimestamps.length === weight) {
       let sumIntervals = 0;
 
       for (let i = 0; i < 3; i++) {
@@ -66,6 +73,8 @@ export default class Loops {
         onStartRecord && onStartRecord(this.bpm)
       }, averageInterval)
     }
+
+    return this.tapTimestamps.length;
   }
 
   stop () {
