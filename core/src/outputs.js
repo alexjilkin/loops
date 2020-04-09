@@ -3,7 +3,11 @@ import {bufferSize, sampleRate} from './consts'
 let master;
 const subscribers = []
 
-export const play = (loop) => {
+let _loop;
+let _nextLoop
+export const browserPlay = (loop) => {
+    _loop = loop;
+
     if (!master) {
         master = new AudioContext({sampleRate});
     }   
@@ -15,7 +19,13 @@ export const play = (loop) => {
 
     const createBuffer = (output) => {
         for (let i = 0; i < buffer.length; i++) {
-            const value = loop[(i + index) % loop.length]
+            const loopIndex = (i + index) % _loop.length
+            if (loopIndex === 0 && _nextLoop) {
+                _loop = _nextLoop
+            }
+
+            const value = _loop[loopIndex]
+
             subscribers.forEach(callback => callback(i, value))
             
             output[i] = value
@@ -30,6 +40,10 @@ export const play = (loop) => {
     source.addEventListener('audioprocess', (e) => {
         createBuffer(e.outputBuffer.getChannelData(0))
     })
+}
+
+export const updateLoop = (nextLoop) => {
+    _nextLoop = nextLoop
 }
 
 export const subscribe = (callback) => {

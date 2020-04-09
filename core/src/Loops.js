@@ -1,5 +1,5 @@
 import {getBrowserInput, initBrowserInput} from './inputs'
-import {play} from './outputs'
+import {browserPlay, updateLoop} from './outputs'
 import {sampleRate, bufferSize} from './consts'
 
 const weight = 4;
@@ -13,7 +13,9 @@ export default class Loops {
     this.bufferCount = 0;
     this.currentLoopIndex = 0;
     this.isRecording = false;
-    this.tap = this.tap.bind(this)
+    this.isPlaying = false;
+    this.tap = this.tap.bind(this);
+    this.maxLoopInSamples = 0;
   }
 
   async startRecording() {
@@ -96,9 +98,33 @@ export default class Loops {
     }
 
     console.log(lengthInBars)
-    const loopSizeInSamples = ((lengthInBars * weight) / this.bpm ) * 60 * sampleRate
+    const loopSizeInSamples = Math.floor(((lengthInBars * weight) / this.bpm ) * 60 * sampleRate)
     
-    play(this.loops[this.currentLoopIndex].slice(0, loopSizeInSamples))
+    this.loops[this.currentLoopIndex] = this.loops[this.currentLoopIndex].slice(0, loopSizeInSamples)
+    if (loopSizeInSamples > this.maxLoopInSamples) {
+      this.maxLoopInSamples = loopSizeInSamples
+    }
+
+    this.play()
+  }
+
+  play() {
+    let finalLoop = new Float32Array(this.maxLoopInSamples)
+
+    for (let i = 0; i < this.maxLoopInSamples; i++) {
+      finalLoop[i] = 0;
+
+      this.loops.forEach(loop => {
+          finalLoop[i] += loop[i % loop.length]
+      })
+    }
+
+    if (this.isPlaying) {
+      updateLoop(finalLoop) 
+    } else {
+      browserPlay(finalLoop)
+      this.isPlaying = true
+    }
   }
 
   async getInputs() {
