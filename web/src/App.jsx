@@ -1,13 +1,12 @@
 import React, {useState, useCallback, useEffect, useRef} from 'react';
 import './App.scss'
-import {Loops, subscribe} from '@loops/core'
-import Oscilloscope from './Oscilloscope'
-import Settings from './Settings';
+import {subscribe} from '@loops/core'
+import Oscilloscope from './components/Oscilloscope'
+import Settings from './components/Settings';
+import useKeyboard from './hooks/useKeyboard'
 import Click from './assets/korg-click.wav'
 import CogIcon from './assets/cog.svg'
-
-const loopsEngine = new Loops('browser');
-var lastInputId = localStorage.getItem('inputId');
+import useLoops from './hooks/useLoops'
 
 const App = () => {
   const [isRecording, setIsRecording] = useState(null)
@@ -15,28 +14,22 @@ const App = () => {
   const [bpm, setBpm] = useState(null)
   const [taps, setTaps] = useState(0)
   const clickAudioRef = useRef(null)
+  const buttonRef = useRef(null)
 
-  useEffect(() => {
-    if (lastInputId) {
-      loopsEngine.setInput(lastInputId)
-    }
-    loopsEngine.subscribeToClick(handleClick)
-    document.addEventListener('keydown', handleKeyboard)
-    document.addEventListener('keyup', () => {
-      document.addEventListener('keydown', handleKeyboard)
-    })
+  const playTap = () => {
+    clickAudioRef.current.currentTime = 0
+    clickAudioRef.current.volume = 0.3
+    clickAudioRef.current.play()
+  }
 
-  }, [])
-
-  const handleRecordingClick = useCallback(() => {
+  const handleTap = useCallback(() => {
     const tapsCount = loopsEngine.tap(startRecord, stopRecord)
+    buttonRef.current.focus()
     setTaps(tapsCount)
   })
 
-  const handleClick = () => {
-    clickAudioRef.current.currentTime = 0
-    clickAudioRef.current.play()
-  }
+  const loopsEngine = useLoops(playTap)
+  useKeyboard(handleTap)
 
   const startRecord = useCallback(async (bpm) => {
     setIsRecording(true)
@@ -47,11 +40,10 @@ const App = () => {
     setIsRecording(false)
   }
 
-  const handleKeyboard = (e) => {
-    document.removeEventListener('keydown', handleKeyboard)
-
-    if(event.code === 'Space') {
-      handleRecordingClick()
+  const handleClick = (e) => {
+    // If its not keyboard
+    if(event.screenX !== 0 && !event.screenY !== 0) {
+      handleTap()
     }
   }
 
@@ -59,11 +51,6 @@ const App = () => {
     setIsSettingsOpen(!isSettingsOpen)
   }, [isSettingsOpen])
 
-  const handleInputChange = useCallback((inputId) => {
-    loopsEngine.setInput(inputId)
-    localStorage.setItem('inputId', inputId);
-    setIsSettingsOpen(false)
-  })
 
   return (
     <div styleName="container">
@@ -72,10 +59,10 @@ const App = () => {
         <img src={CogIcon} />
       </div>
       {isSettingsOpen ? 
-        <Settings getInputs={loopsEngine.getInputs} onInputSelect={handleInputChange} /> :
+        <Settings loopsEngine={loopsEngine} onSettingsToggle={handleSettingsClick}/> :
       <div>
       
-        <button onClick={handleRecordingClick} styleName={`button ${isRecording ? 'stop' : ''}`}> 
+        <button ref={buttonRef} onClick={handleClick} styleName={`button ${isRecording ? 'stop' : ''}`}> 
           {isRecording ? 'Stop ' : 'Tap '}
         </button>
         <div styleName="taps">

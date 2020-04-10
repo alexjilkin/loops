@@ -5,7 +5,7 @@ import {sampleRate, bufferSize} from './consts'
 const weight = 4;
 
 export default class Loops {
-  constructor(type) {
+  constructor(type, onTap) {
     this.type = type
     this.loops = []
     this.tapTimestamps = []
@@ -16,6 +16,7 @@ export default class Loops {
     this.isPlaying = false;
     this.tap = this.tap.bind(this);
     this.maxLoopInSamples = 0;
+    this.onTap = onTap
   }
 
   async startRecording() {
@@ -41,13 +42,13 @@ export default class Loops {
     console.log('init recording')
   }
 
-  subscribeToClick(onClick) {
-    this.onClick = onClick
+  subscribeToClick(onTap) {
+    this.onTap = onTap
   }
 
   tap(onStartRecord, onStopRecord) {
     this.tapTimestamps.push(Date.now())
-    this.onClick();
+    this.onTap();
     
     if (this.isRecording) {
       this.stop()
@@ -75,6 +76,9 @@ export default class Loops {
 
       this.initRecording()
 
+      for (let i = 0; i < 4; i++) {
+
+      }
       setTimeout(() => {
         this.startRecording()
         onStartRecord && onStartRecord(this.bpm)
