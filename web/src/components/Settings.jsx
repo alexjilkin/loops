@@ -1,23 +1,18 @@
 import React, {useEffect, useState, useCallback} from 'react';
+import {getInputs} from '@loops/core'
 import './Settings.scss'
 
-const lastInputId = localStorage.getItem('inputId');
+
 
 const Settings = ({loopsEngine, onSettingsToggle}) => {
   const [inputs, setInputs] = useState([])
 
   useEffect(() => {
     async function init() {
-      setInputs(await loopsEngine.getInputs())
+      setInputs(await getInputs())
     }
 
     init()
-  }, [])
-
-  useEffect(() => {
-    if (lastInputId) {
-      loopsEngine.setInput(lastInputId)
-    }
   }, [])
 
   const setInputId = useCallback((inputId) => {

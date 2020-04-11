@@ -1,3 +1,4 @@
+import {Subject} from 'rxjs'
 import {getBrowserInput, initBrowserInput} from './inputs'
 import {browserPlay, updateLoop} from './outputs'
 import {sampleRate, bufferSize} from './consts'
@@ -5,7 +6,7 @@ import {sampleRate, bufferSize} from './consts'
 const weight = 4;
 
 export default class Loops {
-  constructor(type, onTap) {
+  constructor(type, onStartRecord, onStopRecord,  onTap) {
     this.type = type
     this.loops = []
     this.tapTimestamps = []
@@ -17,6 +18,12 @@ export default class Loops {
     this.tap = this.tap.bind(this);
     this.maxLoopInSamples = 0;
     this.onTap = onTap
+    
+    this.onStartRecord = onStartRecord;
+    this.onStopRecord = onStopRecord
+
+    this.isRecording$ = new Subject();
+    this.isRecording$.subscribe(value => this.isRecording = value)
   }
 
   async startRecording() {
@@ -27,13 +34,14 @@ export default class Loops {
     const handleBuffer = (inputBuffer) => {
       const inputArray = new Float32Array(bufferSize)
 
+      
       inputBuffer.copyFromChannel(inputArray, 0)
 
       this.loops[this.currentLoopIndex].set(inputArray, this.bufferCount * bufferSize)
       this.bufferCount++;
     };
 
-    this.isRecording = true;
+    this.isRecording$.next(true);
     this.stopCallback = await getBrowserInput(handleBuffer)
   }
 
@@ -42,24 +50,20 @@ export default class Loops {
     console.log('init recording')
   }
 
-  subscribeToClick(onTap) {
-    this.onTap = onTap
-  }
-
-  tap(onStartRecord, onStopRecord) {
+  tap() {
     this.tapTimestamps.push(Date.now())
     this.onTap();
     
     if (this.isRecording) {
       this.stop()
-      onStopRecord && onStopRecord()
-      this.isRecording = false;
+      this.onStopRecord && this.onStopRecord()
+      this.isRecording$.next(false);
       return 0;
     }
 
     if (this.bpm) {
       this.startRecording()
-      onStartRecord && onStartRecord(this.bpm)
+      this.onStartRecord && this.onStartRecord(this.bpm)
 
       return 0;
     } else if (this.tapTimestamps.length === weight) {
@@ -71,18 +75,21 @@ export default class Loops {
       
       let averageInterval = sumIntervals / 3
       const bpm = Math.floor(1 / (averageInterval / 60000))
-      console.log(bpm);
       this.bpm = bpm;
 
       this.initRecording()
 
-      for (let i = 0; i < 4; i++) {
+      const recordingIntervalId = setInterval(() => {
+        this.onTap();
 
-      }
+        this.isRecording$.subscribe(isRecording => !isRecording && clearInterval(recordingIntervalId))
+      }, averageInterval)
+      
+    
       setTimeout(() => {
         this.startRecording()
-        onStartRecord && onStartRecord(this.bpm)
-      }, averageInterval)
+        this.onStartRecord && this.onStartRecord(this.bpm)
+      }, averageInterval * 5)
     }
 
     return this.tapTimestamps.length;
@@ -101,7 +108,6 @@ export default class Loops {
       lengthInBars = Math.floor(lengthInBeats / weight);
     }
 
-    console.log(lengthInBars)
     const loopSizeInSamples = Math.floor(((lengthInBars * weight) / this.bpm ) * 60 * sampleRate)
     
     this.loops[this.currentLoopIndex] = this.loops[this.currentLoopIndex].slice(0, loopSizeInSamples)
@@ -126,14 +132,9 @@ export default class Loops {
     if (this.isPlaying) {
       updateLoop(finalLoop) 
     } else {
-      browserPlay(finalLoop)
+      browserPlay(finalLoop, this.bpm, this.onTap)
       this.isPlaying = true
     }
-  }
-
-  async getInputs() {
-    const devices = await navigator.mediaDevices.enumerateDevices()
-    return devices.filter((d) => d.kind === 'audioinput');
   }
 
   setInput(inputDeviceId) {

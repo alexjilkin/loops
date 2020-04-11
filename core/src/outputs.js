@@ -5,9 +5,10 @@ const subscribers = []
 
 let _loop;
 let _nextLoop
-export const browserPlay = (loop) => {
-    _loop = loop;
+export const browserPlay = (loop, bpm, onTap) => {
+    const samplesPerTap = Math.floor(sampleRate * 60 / bpm)
 
+    _loop = loop;
     if (!master) {
         master = new AudioContext({sampleRate});
     }   
@@ -20,6 +21,10 @@ export const browserPlay = (loop) => {
     const createBuffer = (output) => {
         for (let i = 0; i < buffer.length; i++) {
             const loopIndex = (i + index) % _loop.length
+            if (loopIndex % samplesPerTap === 0) {
+                onTap()
+            }
+
             if (loopIndex === 0 && _nextLoop) {
                 _loop = _nextLoop
             }

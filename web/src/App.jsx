@@ -8,6 +8,9 @@ import Click from './assets/korg-click.wav'
 import CogIcon from './assets/cog.svg'
 import useLoops from './hooks/useLoops'
 
+let loopsEngine;
+const lastInputId = localStorage.getItem('inputId');
+
 const App = () => {
   const [isRecording, setIsRecording] = useState(null)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
@@ -16,6 +19,13 @@ const App = () => {
   const clickAudioRef = useRef(null)
   const buttonRef = useRef(null)
 
+  useEffect(() => {
+    loopsEngine.isRecording$.subscribe(setIsRecording)
+    if (lastInputId) {
+      loopsEngine.setInput(lastInputId)
+    }
+  }, [])
+
   const playTap = () => {
     clickAudioRef.current.currentTime = 0
     clickAudioRef.current.volume = 0.3
@@ -23,21 +33,19 @@ const App = () => {
   }
 
   const handleTap = useCallback(() => {
-    const tapsCount = loopsEngine.tap(startRecord, stopRecord)
+    const tapsCount = loopsEngine.tap()
     buttonRef.current.focus()
     setTaps(tapsCount)
   })
 
-  const loopsEngine = useLoops(playTap)
   useKeyboard(handleTap)
 
   const startRecord = useCallback(async (bpm) => {
-    setIsRecording(true)
+
     setBpm(bpm)
   })
 
   const stopRecord = async () => {
-    setIsRecording(false)
   }
 
   const handleClick = (e) => {
@@ -51,6 +59,7 @@ const App = () => {
     setIsSettingsOpen(!isSettingsOpen)
   }, [isSettingsOpen])
 
+  loopsEngine = useLoops(startRecord, stopRecord, playTap)
 
   return (
     <div styleName="container">

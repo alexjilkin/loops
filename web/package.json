@@ -23,7 +23,8 @@
     "react": "^16.8.6",
     "react-dom": "^16.2.0",
     "react-transform-catch-errors": "^1.0.2",
-    "react-transform-hmr": "^1.0.4"
+    "react-transform-hmr": "^1.0.4",
+    "rxjs": "^6.5.5"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",
