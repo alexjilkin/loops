@@ -4,7 +4,7 @@ let _stream
 
 export const getInputs = async () => {
     const devices = await navigator.mediaDevices.enumerateDevices()
-    return devices
+    return devices.filter(device => device.kind === 'audioinput');
 }
 
 export const initBrowserInput = (deviceId) => {

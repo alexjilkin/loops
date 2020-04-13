@@ -1,12 +1,12 @@
 import React, {useEffect, useRef} from 'react';
-
+import {throttleTime} from 'rxjs/operators';
 const width = 400;
 const height = 200;
-const yUnit = height ;
+const yUnit = height * 3;
 
 let lastY = 0;
 
-const Oscilloscope = ({subscribe}) => {
+const Oscilloscope = ({value$}) => {
     const canvasRef = useRef(null)
     let x = useRef(0)
 
@@ -16,25 +16,22 @@ const Oscilloscope = ({subscribe}) => {
         if (canvas.getContext) {
 
             const context = canvas.getContext('2d');
-            subscribe((index, y) => {
-                if (Math.random() < 0.98) {
-                    return;
-                }
+
+            value$.pipe(throttleTime(1)).subscribe((y) => {
                 const canvasWorldX = x.current % width;
                 const canvasWorldY = (height * (3/5)) + (y * yUnit)
-                //context.fillRect(canvasWorldX, canvasWorldY , 1, 1);
 
                 if (canvasWorldX === 0) {
                     context.beginPath();
                     lastY = 0;
                 }
 
-                context.clearRect(canvasWorldX + 1, 0, 1, height)
-                context.moveTo(canvasWorldX - 1, lastY);
+                context.clearRect(canvasWorldX + 2, 0, 2, height)
+                context.moveTo(canvasWorldX - 2, lastY);
                 context.lineTo(canvasWorldX, canvasWorldY);
                 context.stroke();
 
-                x.current = x.current + 1;
+                x.current = x.current + 2;
                 lastY = canvasWorldY;
             })
         }

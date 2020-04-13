@@ -1,10 +1,17 @@
 
 import {bufferSize, sampleRate} from './consts'
+import {Subject} from 'rxjs'
+
 let master;
 const subscribers = []
 
 let _loop;
 let _nextLoop
+
+export const tap$ = new Subject()
+export const value$ = new Subject()
+export const newLoop$ = new Subject()
+
 export const browserPlay = (loop, bpm, onTap) => {
     const samplesPerTap = Math.floor(sampleRate * 60 / bpm)
 
@@ -22,16 +29,20 @@ export const browserPlay = (loop, bpm, onTap) => {
         for (let i = 0; i < buffer.length; i++) {
             const loopIndex = (i + index) % _loop.length
             if (loopIndex % samplesPerTap === 0) {
-                onTap()
+                tap$.next((loopIndex / samplesPerTap) + 1)
             }
 
-            if (loopIndex === 0 && _nextLoop) {
-                _loop = _nextLoop
+            if (loopIndex === 0) {
+                if (_nextLoop) {
+                    _loop = _nextLoop
+                }
+                
+                newLoop$.next()
             }
 
             const value = _loop[loopIndex]
 
-            subscribers.forEach(callback => callback(i, value))
+            value$.next(value)
             
             output[i] = value
         }
@@ -49,11 +60,4 @@ export const browserPlay = (loop, bpm, onTap) => {
 
 export const updateLoop = (nextLoop) => {
     _nextLoop = nextLoop
-}
-
-export const subscribe = (callback) => {
-    const index = subscribers.length
-    subscribers.push(callback)
-
-    return () => subscribers = [...subscribers.slice(0, index - 1), subscribers.slice(index)]
 }

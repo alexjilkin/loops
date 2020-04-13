@@ -1,6 +1,6 @@
 import React, {useState, useCallback, useEffect, useRef} from 'react';
 import './App.scss'
-import {subscribe} from '@loops/core'
+import {value$} from '@loops/core'
 import Oscilloscope from './components/Oscilloscope'
 import Settings from './components/Settings';
 import useKeyboard from './hooks/useKeyboard'
@@ -21,14 +21,21 @@ const App = () => {
 
   useEffect(() => {
     loopsEngine.isRecording$.subscribe(setIsRecording)
+    loopsEngine.getTap().subscribe(playTap)
     if (lastInputId) {
       loopsEngine.setInput(lastInputId)
     }
   }, [])
 
-  const playTap = () => {
+  const playTap = (beatCount) => {
     clickAudioRef.current.currentTime = 0
-    clickAudioRef.current.volume = 0.3
+
+    if (beatCount === 1) {
+      clickAudioRef.current.volume = 0.3
+    } else {
+      clickAudioRef.current.volume = 0.1
+    }
+    
     clickAudioRef.current.play()
   }
 
@@ -59,7 +66,7 @@ const App = () => {
     setIsSettingsOpen(!isSettingsOpen)
   }, [isSettingsOpen])
 
-  loopsEngine = useLoops(startRecord, stopRecord, playTap)
+  loopsEngine = useLoops(startRecord, stopRecord)
 
   return (
     <div styleName="container">
@@ -85,7 +92,7 @@ const App = () => {
           {bpm && `BPM: ${bpm}`}
          </div>
         <div styleName="output-wave">
-          <Oscilloscope subscribe={subscribe} />
+          <Oscilloscope value$={value$} />
         </div>
       </div>
       }
