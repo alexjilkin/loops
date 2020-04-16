@@ -127,7 +127,7 @@ export default class Loops {
       finalLoop[i] = 0;
 
       this.loops.forEach(loop => {
-          finalLoop[i] += loop[i % loop.length]
+          finalLoop[i] += loop[i % loop.length] * 0.8
       })
     }
 
