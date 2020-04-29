@@ -101,19 +101,10 @@ export default class Loops {
   stop () {
     this.stopCallback();
     const samplesCount = (this.bufferCount ) * bufferSize;
-    const lengthInMinutes = (samplesCount / sampleRate) / 60;
-    const lengthInBeats = Math.round(lengthInMinutes * this.bpm);
 
-    let lengthInBars;
-    if (lengthInBeats % weight >= 1) {
-      lengthInBars = Math.floor(lengthInBeats / weight) + 1;
-    } else {
-      lengthInBars = Math.floor(lengthInBeats / weight);
-    }
+    this.loops[this.currentLoopIndex] = normalizeLoop(this.loops[this.currentLoopIndex], this.bpm, samplesCount)
+    const loopSizeInSamples = this.loops[this.currentLoopIndex].length
 
-    const loopSizeInSamples = Math.floor(((lengthInBars * weight) / this.bpm ) * 60 * sampleRate)
-    
-    this.loops[this.currentLoopIndex] = this.loops[this.currentLoopIndex].slice(0, loopSizeInSamples)
     if (loopSizeInSamples > this.maxLoopInSamples) {
       this.maxLoopInSamples = loopSizeInSamples
     }
@@ -152,4 +143,20 @@ export default class Loops {
   getLoops() {
     return this.loops$.asObservable()
   }
+}
+
+function normalizeLoop(loop, bpm, samplesCount) {
+  const lengthInMinutes = (samplesCount / sampleRate) / 60;
+  const lengthInBeats = Math.round(lengthInMinutes * bpm);
+
+  let lengthInBars;
+  if (lengthInBeats % weight >= 1) {
+    lengthInBars = Math.floor(lengthInBeats / weight) + 1;
+  } else {
+    lengthInBars = Math.floor(lengthInBeats / weight);
+  }
+
+  const loopSizeInSamples = Math.floor(((lengthInBars * weight) / bpm ) * 60 * sampleRate)
+  
+   return loop.slice(0, loopSizeInSamples)
 }
