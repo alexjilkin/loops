@@ -8,11 +8,11 @@ const subscribers = []
 let _loop;
 let _nextLoop
 
-export const tap$ = new Subject()
+export const onTap$ = new Subject()
 export const value$ = new Subject()
-export const newLoop$ = new Subject()
+export const onNewLoop$ = new Subject()
 
-export const browserPlay = (loop, bpm, onTap) => {
+export const browserPlay = (loop, bpm) => {
     const samplesPerTap = Math.floor(sampleRate * 60 / bpm)
 
     _loop = loop;
@@ -29,7 +29,7 @@ export const browserPlay = (loop, bpm, onTap) => {
         for (let i = 0; i < buffer.length; i++) {
             const loopIndex = (i + index) % _loop.length
             if (loopIndex % samplesPerTap === 0) {
-                tap$.next((loopIndex / samplesPerTap) + 1)
+                onTap$.next((loopIndex / samplesPerTap) + 1)
             }
 
             if (loopIndex === 0) {
@@ -37,7 +37,7 @@ export const browserPlay = (loop, bpm, onTap) => {
                     _loop = _nextLoop
                 }
                 
-                newLoop$.next()
+                onNewLoop$.next()
             }
 
             const value = _loop[loopIndex]

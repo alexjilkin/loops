@@ -8,7 +8,6 @@ import Click from './assets/korg-click.wav'
 import CogIcon from './assets/cog.svg'
 import useLoops from './hooks/useLoops'
 
-let loopsEngine;
 const lastInputId = localStorage.getItem('inputId');
 
 const App = () => {
@@ -16,6 +15,7 @@ const App = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [bpm, setBpm] = useState(null)
   const [taps, setTaps] = useState(0)
+
   const clickAudioRef = useRef(null)
   const buttonRef = useRef(null)
 
@@ -66,7 +66,7 @@ const App = () => {
     setIsSettingsOpen(!isSettingsOpen)
   }, [isSettingsOpen])
 
-  loopsEngine = useLoops(startRecord, stopRecord)
+  const [loopsEngine, loops] = useLoops(startRecord, stopRecord)
 
   return (
     <div styleName="container">
@@ -90,7 +90,12 @@ const App = () => {
         </div>
         <div styleName="bpm">
           {bpm && `BPM: ${bpm}`}
-         </div>
+        </div>
+        <div styleName="loops">
+          {loops.map((loop, index) => 
+            <div key={index} styleName="loop"> {index} </div>
+          )}
+        </div>
         <div styleName="output-wave">
           <Oscilloscope value$={value$} />
         </div>

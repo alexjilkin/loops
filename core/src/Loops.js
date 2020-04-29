@@ -1,7 +1,7 @@
 import {BehaviorSubject} from 'rxjs'
 import {first} from 'rxjs/operators'
 import {getBrowserInput, initBrowserInput} from './inputs'
-import {browserPlay, updateLoop, newLoop$, tap$} from './outputs'
+import {browserPlay, updateLoop, onNewLoop$, onTap$} from './outputs'
 import {sampleRate, bufferSize} from './consts'
 
 const weight = 4;
@@ -21,6 +21,7 @@ export default class Loops {
     this.onStartRecord = onStartRecord
     this.onStopRecord = onStopRecord
     this.isRecording$ = new BehaviorSubject(false);
+    this.loops$ = new BehaviorSubject([])
     this.isRecording$.subscribe(value => this.isRecording = value)
   }
 
@@ -55,7 +56,7 @@ export default class Loops {
       this.isRecording$.next(false);
       return 0;
     } else if (this.bpm) {
-      newLoop$.pipe(first()).subscribe(() => {
+      onNewLoop$.pipe(first()).subscribe(() => {
         this.startRecording()
         this.onStartRecord && this.onStartRecord(this.bpm)
         console.log('New recording')
@@ -78,7 +79,7 @@ export default class Loops {
       
       let recordingBeatCount = 1;
       const recordingIntervalId = setInterval(() => {
-        tap$.next(recordingBeatCount % 4);
+        onTap$.next(recordingBeatCount % 4);
         
 
         recordingBeatCount++;
@@ -92,7 +93,7 @@ export default class Loops {
       }, averageInterval * 5)
     }
 
-    tap$.next(this.tapTimestamps.length)
+    onTap$.next(this.tapTimestamps.length)
 
     return this.tapTimestamps.length;
   }
@@ -117,6 +118,7 @@ export default class Loops {
       this.maxLoopInSamples = loopSizeInSamples
     }
 
+    this.loops$.next([...this.loops])
     this.play()
   }
 
@@ -144,6 +146,10 @@ export default class Loops {
   }
 
   getTap() {
-    return tap$.asObservable()
+    return onTap$.asObservable()
+  }
+
+  getLoops() {
+    return this.loops$.asObservable()
   }
 }

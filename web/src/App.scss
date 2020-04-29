@@ -44,6 +44,20 @@ $reset-shadow-color:  #8C2022;
 		cursor: pointer;
 	}
 
+	.loops {
+		display: flex;
+
+		.loop {
+			border-radius: 50%;
+			width: 1.5em;
+			height: 1.5em;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			background-color: grey;
+		}
+	}
+
 	.bpm {
 		margin-top: 1em;
 	}
