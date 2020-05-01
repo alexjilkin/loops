@@ -1,12 +1,13 @@
 import {useState, useRef, useEffect} from 'react'
 import {Loops} from '@loops/core'
 
-const useLoops = (startRecord, stopRecord, onTap) => {
+const useLoops = (onTap, setBpm) => {
     const [loops, setLoops] = useState([])
-    let loopsEngine = useRef(new Loops('browser', startRecord ,stopRecord,onTap));
+    let loopsEngine = useRef(new Loops('browser', (bpm) => setBpm(bpm) ,() => {}, onTap));
 
     useEffect(() => {
         loopsEngine.current.getLoops().subscribe(setLoops)
+        loopsEngine.current.getTap().subscribe(onTap)
     }
     ,[])
     

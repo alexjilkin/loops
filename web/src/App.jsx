@@ -1,31 +1,20 @@
 import React, {useState, useCallback, useEffect, useRef} from 'react';
-import './App.scss'
 import {value$} from '@loops/core'
 import Oscilloscope from './components/Oscilloscope'
 import Settings from './components/Settings';
-import useKeyboard from './hooks/useKeyboard'
+import RecordButton from './components/RecordButton'
 import Click from './assets/korg-click.wav'
 import CogIcon from './assets/cog.svg'
 import useLoops from './hooks/useLoops'
-
+import './App.scss'
 const lastInputId = localStorage.getItem('inputId');
 
 const App = () => {
   const [isRecording, setIsRecording] = useState(null)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [bpm, setBpm] = useState(null)
-  const [taps, setTaps] = useState(0)
 
   const clickAudioRef = useRef(null)
-  const buttonRef = useRef(null)
-
-  useEffect(() => {
-    loopsEngine.isRecording$.subscribe(setIsRecording)
-    loopsEngine.getTap().subscribe(playTap)
-    if (lastInputId) {
-      loopsEngine.setInput(lastInputId)
-    }
-  }, [])
 
   const playTap = (beatCount) => {
     clickAudioRef.current.currentTime = 0
@@ -38,35 +27,20 @@ const App = () => {
     
     clickAudioRef.current.play()
   }
+  
+  const [loopsEngine, loops] = useLoops(playTap, setBpm)
 
-  const handleTap = useCallback(() => {
-    const tapsCount = loopsEngine.tap()
-    buttonRef.current.focus()
-    setTaps(tapsCount)
-  })
-
-  useKeyboard(handleTap)
-
-  const startRecord = useCallback(async (bpm) => {
-
-    setBpm(bpm)
-  })
-
-  const stopRecord = async () => {
-  }
-
-  const handleClick = (e) => {
-    // If its not keyboard
-    if(event.screenX !== 0 && !event.screenY !== 0) {
-      handleTap()
+  useEffect(() => {
+    loopsEngine.isRecording$.subscribe(setIsRecording)
+    
+    if (lastInputId) {
+      loopsEngine.setInput(lastInputId)
     }
-  }
+  }, [])
 
   const handleSettingsClick = useCallback(() => {
     setIsSettingsOpen(!isSettingsOpen)
   }, [isSettingsOpen])
-
-  const [loopsEngine, loops] = useLoops(startRecord, stopRecord)
 
   return (
     <div styleName="container">
@@ -77,28 +51,18 @@ const App = () => {
       {isSettingsOpen ? 
         <Settings loopsEngine={loopsEngine} onSettingsToggle={handleSettingsClick}/> :
       <div>
-      
-        <button ref={buttonRef} onClick={handleClick} styleName={`button ${isRecording ? 'stop' : ''}`}> 
-          {isRecording ? 'Stop ' : 'Tap '}
-        </button>
-        <div styleName="taps">
-          {
-            Array.from({length: taps}).map((v, i) => (
-              <div key={i} styleName="tap"></div>
-            )) 
-          }
-        </div>
-        <div styleName="bpm">
-          {bpm && `BPM: ${bpm}`}
-        </div>
-        <div styleName="loops">
-          {loops.map((loop, index) => 
-            <div key={index} styleName="loop"> {index} </div>
-          )}
-        </div>
-        <div styleName="output-wave">
-          <Oscilloscope value$={value$} />
-        </div>
+      <RecordButton loopsEngine={loopsEngine} isRecording={isRecording} />
+      <div styleName="bpm">
+        {bpm && `BPM: ${bpm}`}
+      </div>
+      <div styleName="loops">
+        {loops.map((loop, index) => 
+          <div key={index} styleName="loop"> {index} </div>
+        )}
+      </div>
+      <div styleName="output-wave">
+        <Oscilloscope value$={value$} />
+      </div>
       </div>
       }
 

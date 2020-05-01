@@ -7,7 +7,7 @@ import {sampleRate, bufferSize} from './consts'
 const weight = 4;
 
 export default class Loops {
-  constructor(type, onStartRecord, onStopRecord,  ) {
+  constructor(type, onStartRecord, onStopRecord) {
     this.type = type
     this.loops = []
     this.tapTimestamps = []
