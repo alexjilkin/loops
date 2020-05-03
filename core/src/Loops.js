@@ -1,9 +1,8 @@
 import {BehaviorSubject} from 'rxjs'
 import {first} from 'rxjs/operators'
 import {getBrowserInput, initBrowserInput} from './inputs'
-import {browserPlay, updateLoop, onNewLoop$, onTap$} from './outputs'
+import {browserLoopPlay, updateLoop, onNewLoop$, onTap$, playFromGenerator} from './outputs'
 import {sampleRate, bufferSize} from './consts'
-
 const weight = 4;
 
 export default class Loops {
@@ -43,9 +42,11 @@ export default class Loops {
   }
 
   initRecording() {
-    initBrowserInput(this.inputDeviceId)
     console.log('init recording')
+    return initBrowserInput(this.inputDeviceId)
   }
+
+
 
   tap() {
     this.tapTimestamps.push(Date.now())
@@ -127,7 +128,7 @@ export default class Loops {
     if (this.isPlaying) {
       updateLoop(finalLoop) 
     } else {
-      browserPlay(finalLoop, this.bpm)
+      browserLoopPlay(finalLoop, this.bpm)
       this.isPlaying = true
     }
   }

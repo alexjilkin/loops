@@ -3,6 +3,7 @@ import {bufferSize, sampleRate} from './consts'
 import {Subject} from 'rxjs'
 
 let master;
+let playbackMaster;
 const subscribers = []
 
 let _loop;
@@ -12,7 +13,7 @@ export const onTap$ = new Subject()
 export const value$ = new Subject()
 export const onNewLoop$ = new Subject()
 
-export const browserPlay = (loop, bpm) => {
+export const browserLoopPlay = (loop, bpm) => {
     const samplesPerTap = Math.floor(sampleRate * 60 / bpm)
 
     _loop = loop;
@@ -52,6 +53,30 @@ export const browserPlay = (loop, bpm) => {
 
     source.buffer = buffer;
     source.connect(master.destination);
+
+    source.addEventListener('audioprocess', (e) => {
+        createBuffer(e.outputBuffer.getChannelData(0))
+    })
+}
+
+export const playFromGenerator = (generator) => {
+    if (!playbackMaster) {
+        playbackMaster = new AudioContext({sampleRate});
+    }   
+
+    const buffer = playbackMaster.createBuffer(1, bufferSize, sampleRate)
+    const source = playbackMaster.createScriptProcessor(bufferSize, 1, 1);
+
+    const createBuffer = (output) => {
+        for (let i = 0; i < buffer.length; i++) {
+            let value = generator.next().value
+            value$.next(value)
+            output[i] = value
+        }
+    }
+
+    source.buffer = buffer;
+    source.connect(playbackMaster.destination);
 
     source.addEventListener('audioprocess', (e) => {
         createBuffer(e.outputBuffer.getChannelData(0))

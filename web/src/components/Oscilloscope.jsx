@@ -2,7 +2,7 @@ import React, {useEffect, useRef} from 'react';
 import {throttleTime} from 'rxjs/operators';
 const width = 400;
 const height = 200;
-const yUnit = height * 3;
+const yUnit = height ;
 
 let lastY = 0;
 

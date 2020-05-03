@@ -8,9 +8,10 @@ export const getInputs = async () => {
 }
 
 export const initBrowserInput = (deviceId) => {
-    navigator.mediaDevices.getUserMedia({audio: {deviceId, sampleRate}, video: false })
-        .then(stream => _stream = stream)
     console.log('init browser input')
+    
+    return navigator.mediaDevices.getUserMedia({audio: {deviceId, sampleRate}, video: false })
+        .then(stream => _stream = stream)
 }
 
 export const getBrowserInput = async (onAudio) => {
