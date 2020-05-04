@@ -6,16 +6,15 @@ import RecordButton from './components/RecordButton'
 import Click from './assets/korg-click.wav'
 import CogIcon from './assets/cog.svg'
 import useLoops from './hooks/useLoops'
-import {Amp} from '@loops/core'
+import Amp from './components/Amp'
 
 import './App.scss'
 const lastInputId = localStorage.getItem('inputId');
-const amp = new Amp(lastInputId)
+
 
 const App = () => {
   const [isRecording, setIsRecording] = useState(null)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
-  const [isPlaybackOn, setIsPlaybackOn] = useState(false)
   const [bpm, setBpm] = useState(null)
 
   const clickAudioRef = useRef(null)
@@ -32,18 +31,6 @@ const App = () => {
     clickAudioRef.current.play()
   }
   
-
-  const handlePlayback = useCallback(() => {
-    setIsPlaybackOn((isPlaybackOn) => {
-      if (!isPlaybackOn) {
-        amp.initRecording().then(() => {
-          amp.monitor()
-        })
-      }
-      return !isPlaybackOn
-    })
-  }, [isPlaybackOn])
-
   const [loopsEngine, loops] = useLoops(playTap, setBpm)
 
   useEffect(() => {
@@ -61,6 +48,9 @@ const App = () => {
 
   return (
     <div styleName="container">
+      <div style={{marginBottom: 20}}>
+        <Amp loopsEngine={loopsEngine} inputId={lastInputId} />
+      </div>
       <audio src={Click} ref={clickAudioRef}></audio>
       <div styleName="settings" onClick={handleSettingsClick}>
         <img src={CogIcon} />
@@ -68,9 +58,7 @@ const App = () => {
       {isSettingsOpen ? 
         <Settings loopsEngine={loopsEngine} onSettingsToggle={handleSettingsClick}/> :
       <div>
-      <div style={{padding: 10}} onClick={handlePlayback}>
-        {isPlaybackOn ? 'Stop' : 'Start'} playback
-      </div>
+
       <RecordButton loopsEngine={loopsEngine} isRecording={isRecording} />
       <div styleName="bpm">
         {bpm && `BPM: ${bpm}`}

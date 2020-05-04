@@ -6,7 +6,7 @@ import {sampleRate, bufferSize} from './consts'
 const weight = 4;
 
 export default class Loops {
-  constructor(type, onStartRecord, onStopRecord) {
+  constructor(type, onStartRecord) {
     this.type = type
     this.loops = []
     this.tapTimestamps = []
@@ -18,10 +18,10 @@ export default class Loops {
     this.tap = this.tap.bind(this)
     this.maxLoopInSamples = 0
     this.onStartRecord = onStartRecord
-    this.onStopRecord = onStopRecord
     this.isRecording$ = new BehaviorSubject(false);
     this.loops$ = new BehaviorSubject([])
     this.isRecording$.subscribe(value => this.isRecording = value)
+    this.middlewares = []
   }
 
   async startRecording() {
@@ -46,14 +46,15 @@ export default class Loops {
     return initBrowserInput(this.inputDeviceId)
   }
 
-
+  addMiddleware(middleware) {
+    this.middlewares.push(middleware)
+  }
 
   tap() {
     this.tapTimestamps.push(Date.now())
     
     if (this.isRecording) {
       this.stop()
-      this.onStopRecord && this.onStopRecord()
       this.isRecording$.next(false);
       return 0;
     } else if (this.bpm) {
@@ -128,7 +129,7 @@ export default class Loops {
     if (this.isPlaying) {
       updateLoop(finalLoop) 
     } else {
-      browserLoopPlay(finalLoop, this.bpm)
+      browserLoopPlay(finalLoop, this.bpm,  this.middlewares)
       this.isPlaying = true
     }
   }
@@ -159,5 +160,5 @@ function normalizeLoop(loop, bpm, samplesCount) {
 
   const loopSizeInSamples = Math.floor(((lengthInBars * weight) / bpm ) * 60 * sampleRate)
   
-   return loop.slice(0, loopSizeInSamples)
+   return loop.slice(bufferSize, loopSizeInSamples)
 }

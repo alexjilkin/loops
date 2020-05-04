@@ -1,6 +1,8 @@
 import {sampleRate, bufferSize} from '../consts'
 let _recordContext
-let _stream
+
+let source
+let processor
 
 export const getInputs = async () => {
     const devices = await navigator.mediaDevices.enumerateDevices()
@@ -11,14 +13,16 @@ export const initBrowserInput = (deviceId) => {
     console.log('init browser input')
     
     return navigator.mediaDevices.getUserMedia({audio: {deviceId, sampleRate}, video: false })
-        .then(stream => _stream = stream)
+        .then(stream => {
+            source = _recordContext.createMediaStreamSource(stream);
+    
+            processor = _recordContext.createScriptProcessor(bufferSize, 1, 1);
+        })
 }
 
 export const getBrowserInput = async (onAudio) => {
     _recordContext = new AudioContext({sampleRate});
-    const source = _recordContext.createMediaStreamSource(_stream);
-    
-    const processor = _recordContext.createScriptProcessor(bufferSize, 4, 4);
+
 
     source.connect(processor);
     processor.connect(_recordContext.destination);

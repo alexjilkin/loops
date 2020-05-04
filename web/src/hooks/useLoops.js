@@ -3,7 +3,7 @@ import {Loops} from '@loops/core'
 
 const useLoops = (onTap, setBpm) => {
     const [loops, setLoops] = useState([])
-    let loopsEngine = useRef(new Loops('browser', (bpm) => setBpm(bpm) ,() => {}, onTap));
+    let loopsEngine = useRef(new Loops('browser', (bpm) => setBpm(bpm)));
 
     useEffect(() => {
         loopsEngine.current.getLoops().subscribe(setLoops)

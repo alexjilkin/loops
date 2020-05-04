@@ -1,0 +1,13 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 70px;
+    height: 70px;
+    background-color: lightblue;
+    border-radius: 5px;
+
+    .button {
+        cursor: pointer;
+    }
+}
