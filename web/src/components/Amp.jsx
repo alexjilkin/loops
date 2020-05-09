@@ -1,34 +1,37 @@
 import React, {useRef, useEffect, useCallback, useState} from 'react'
 import {Amp} from '@loops/core'
+import {Delay} from '@loops/core'
+const delay = new Delay()
+
 import './Amp.scss'
 
 export default ({loopsEngine, inputId}) => {
 
-    const [isPlaybackOn, setIsPlaybackOn] = useState(false)
+    const [isOn, setIsOn] = useState(false)
     const [amp] = useAmp(inputId)
 
     useEffect(() => {
       loopsEngine.addMiddleware(amp.getTransferFunction())
+      loopsEngine.addMiddleware(delay.transferFunc)
     }, [])
-    const handlePlayback = useCallback(() => {
-      setIsPlaybackOn((isPlaybackOn) => {
-        if (!isPlaybackOn) {
-          amp.initRecording().then(() => {
-            amp.monitor()
-          })
+
+    const handleToggle = useCallback(() => {
+      setIsOn((isOn) => {
+        if (!isOn) {
+           loopsEngine.addMiddleware(amp.getTransferFunction())
         } else {
-          amp.stopMonitor()
+          // remove
         }
-        return !isPlaybackOn
+        return !isOn
       })
-    }, [isPlaybackOn])
+    }, [isOn])
 
     return (
       <div>
       Amp
         <div styleName="container">
-          <div styleName="button" onClick={handlePlayback}>
-            {isPlaybackOn ? 'On' : 'Off'} 
+          <div styleName="button" onClick={handleToggle}>
+            {isOn ? 'On' : 'Off'} 
           </div>
         </div>
       </div>

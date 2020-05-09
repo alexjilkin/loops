@@ -20,6 +20,8 @@ export default class Loops {
     this.onStartRecord = onStartRecord
     this.isRecording$ = new BehaviorSubject(false);
     this.loops$ = new BehaviorSubject([])
+    this.monitor$ = new BehaviorSubject(false)
+
     this.isRecording$.subscribe(value => this.isRecording = value)
     this.middlewares = []
   }
@@ -38,7 +40,36 @@ export default class Loops {
     };
 
     this.isRecording$.next(true);
+    await this.initRecording()
     this.stopCallback = await getBrowserInput(handleBuffer)
+  }
+
+  async startMonitor() {
+    const monitorBufferSize = bufferSize * 20 
+
+    let monitorBuffer = new Float32Array(monitorBufferSize)
+    let bufferCount = 0;
+    
+    function* monitorGenerator(middlewares) {
+      let index = 0;
+
+      while (true) {
+        const value = monitorBuffer[(index) % (monitorBufferSize)]
+        yield value ? middlewares.reduce((acc, func) => func(acc), value) : 0
+        index++;
+      }
+    }
+
+    const handleBuffer = (inputBuffer) => {
+      const inputArray = new Float32Array(bufferSize)
+      inputBuffer.copyFromChannel(inputArray, 0)
+
+      monitorBuffer.set(inputArray, (bufferSize * bufferCount) % monitorBufferSize)
+      bufferCount++;
+    }
+    await this.initRecording()
+    this.stopCallback = await getBrowserInput(handleBuffer)
+    setTimeout(() => playFromGenerator(monitorGenerator(this.middlewares)), (bufferSize / sampleRate) * 1000)
   }
 
   initRecording() {
@@ -76,23 +107,21 @@ export default class Loops {
       let averageInterval = sumIntervals / 3
       const bpm = Math.floor(1 / (averageInterval / 60000))
       this.bpm = bpm;
-
-      this.initRecording()
       
       let recordingBeatCount = 1;
+
       const recordingIntervalId = setInterval(() => {
+        if (recordingBeatCount === weight + 1) {
+          this.startRecording()
+          this.onStartRecord && this.onStartRecord(this.bpm)
+        }
+
         onTap$.next(recordingBeatCount % 4);
-        
 
         recordingBeatCount++;
       }, averageInterval)
       
       this.isRecording$.subscribe(isRecording => recordingBeatCount > 4 && !isRecording && clearInterval(recordingIntervalId))
-
-      setTimeout(() => {
-        this.startRecording()
-        this.onStartRecord && this.onStartRecord(this.bpm)
-      }, averageInterval * 5)
     }
 
     onTap$.next(this.tapTimestamps.length)

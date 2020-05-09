@@ -13,7 +13,7 @@ export const onTap$ = new Subject()
 export const value$ = new Subject()
 export const onNewLoop$ = new Subject()
 
-export const browserLoopPlay = (loop, bpm, transferFunc) => {
+export const browserLoopPlay = (loop, bpm, transferFuncs) => {
     const samplesPerTap = Math.floor(sampleRate * 60 / bpm)
 
     _loop = loop;
@@ -39,9 +39,10 @@ export const browserLoopPlay = (loop, bpm, transferFunc) => {
                 }
                 
                 onNewLoop$.next()
+                break;
             }
 
-            const value = transferFunc.reduce((acc, func) => func(acc), _loop[loopIndex])
+            const value = transferFuncs.reduce((acc, func) => func(acc), _loop[loopIndex])
 
             value$.next(value)
             
@@ -62,8 +63,8 @@ export const browserLoopPlay = (loop, bpm, transferFunc) => {
 export const playFromGenerator = (generator) => {
     if (!playbackMaster) {
         playbackMaster = new AudioContext({sampleRate});
-    }   
-
+    }
+    
     const buffer = playbackMaster.createBuffer(1, bufferSize, sampleRate)
     const source = playbackMaster.createScriptProcessor(bufferSize, 1, 1);
 

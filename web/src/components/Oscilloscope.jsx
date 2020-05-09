@@ -2,7 +2,7 @@ import React, {useEffect, useRef} from 'react';
 import {throttleTime} from 'rxjs/operators';
 const width = 400;
 const height = 200;
-const yUnit = height ;
+const yUnit = height / 1.5 ;
 
 let lastY = 0;
 
@@ -17,7 +17,7 @@ const Oscilloscope = ({value$}) => {
 
             const context = canvas.getContext('2d');
 
-            value$.pipe(throttleTime(1)).subscribe((y) => {
+            value$.pipe(throttleTime(50)).subscribe((y) => {
                 const canvasWorldX = x.current % width;
                 const canvasWorldY = (height * (3/5)) + (y * yUnit)
 

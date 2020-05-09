@@ -16,6 +16,7 @@ const App = () => {
   const [isRecording, setIsRecording] = useState(null)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [bpm, setBpm] = useState(null)
+  const [isPlaybackOn, setIsPlaybackOn] = useState(false)
 
   const clickAudioRef = useRef(null)
 
@@ -46,8 +47,24 @@ const App = () => {
     setIsSettingsOpen(!isSettingsOpen)
   }, [isSettingsOpen])
 
+  const handlePlayback = useCallback(() => {
+    setIsPlaybackOn((isPlaybackOn) => {
+      if (!isPlaybackOn) {
+        loopsEngine.startMonitor()
+      
+      } else {
+        //loopsEngine.stopMonitor()
+      }
+
+      return !isPlaybackOn
+    })
+  }, [isPlaybackOn])
+
   return (
     <div styleName="container">
+      <div styleName="button" onClick={handlePlayback}>
+          {isPlaybackOn ? 'On' : 'Off'} 
+      </div>
       <div style={{marginBottom: 20}}>
         <Amp loopsEngine={loopsEngine} inputId={lastInputId} />
       </div>
@@ -69,7 +86,7 @@ const App = () => {
         )}
       </div>
       <div styleName="output-wave">
-        <Oscilloscope value$={value$} />
+        {/* <Oscilloscope value$={value$} /> */}
       </div>
       </div>
       }

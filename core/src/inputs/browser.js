@@ -14,19 +14,16 @@ export const initBrowserInput = (deviceId) => {
     
     return navigator.mediaDevices.getUserMedia({audio: {deviceId, sampleRate}, video: false })
         .then(stream => {
+            _recordContext = new AudioContext({sampleRate});
             source = _recordContext.createMediaStreamSource(stream);
-    
             processor = _recordContext.createScriptProcessor(bufferSize, 1, 1);
+
+            source.connect(processor);
+            processor.connect(_recordContext.destination);
         })
 }
 
 export const getBrowserInput = async (onAudio) => {
-    _recordContext = new AudioContext({sampleRate});
-
-
-    source.connect(processor);
-    processor.connect(_recordContext.destination);
-
     processor.onaudioprocess = ({inputBuffer}) => onAudio(inputBuffer)
 
     return () => _recordContext.close()
