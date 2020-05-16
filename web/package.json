@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@loops/core": "1.0.0",
+    "@jsynth/core": "1.1.0",
     "history": "^4.9.0",
     "lodash": "^4.17.15",
     "postcss-nested": "^4.1.2",

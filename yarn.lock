@@ -825,6 +825,14 @@
   resolved "https://registry.yarnpkg.com/@csstools/convert-colors/-/convert-colors-1.4.0.tgz#ad495dc41b12e75d588c6db8b9834f08fa131eb7"
   integrity sha512-5a6wqoJV/xEdbRNKVo6I4hO3VjyDq//8q2f9I6PBAvMesJHFauXDorcNCsr9RzvsZnaWi5NYCcfyqP1QeFHFbw==
 
+"@jsynth/core@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@jsynth/core/-/core-1.1.0.tgz#e128159e2b062e0ea3424464835a4d43e6f7aed9"
+  integrity sha512-BuAB7B5/8Ct+cZnrOS/ntSdp8JkqTxJ2V9daIj8V4JbZ2BDyoAbxnXr7xOzTxeIX1QSNukksH7rft5ZAJBxXfQ==
+  dependencies:
+    react "^16.13.1"
+    rxjs "^6.5.5"
+
 "@types/events@*":
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@types/events/-/events-3.0.0.tgz#2862f3f58a9a7f7c3e78d79f130dd4d71c25c2a7"
@@ -6414,7 +6422,7 @@ react-transform-hmr@^1.0.4:
     global "^4.3.0"
     react-proxy "^1.1.7"
 
-react@^16.8.6:
+react@^16.13.1, react@^16.8.6:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react/-/react-16.13.1.tgz#2e818822f1a9743122c063d6410d85c1e3afe48e"
   integrity sha512-YMZQQq32xHLX0bz5Mnibv1/LHb3Sqzngu7xstSM+vrkE5Kzr9xE0yMByK5kMoTK30YVJE61WfbxIFFvfeDKT1w==
