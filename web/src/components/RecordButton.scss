@@ -1,5 +1,5 @@
-$outline-width: 6px;
-$shadow-width: 4px;
+$outline-width: 4px;
+$shadow-width: 2px;
 $button-background: #92CD41;
 $sec-button-background: #76c442;
 $shadow-color:  #4AA52E;
@@ -15,11 +15,10 @@ $reset-shadow-color:  #8C2022;
 .button {
     background: $button-background;
     position: relative;
-    width: 3em;
-    height: 2.5em;
-    padding: 0.3em;
+    width: 60px;
+    height: 45px;
     text-align: center;
-    font-size: 1.3em;
+    font-size: 15px;
     cursor: pointer;
     font-family: 'Press Start 2P';
     text-decoration: none; 

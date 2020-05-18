@@ -85,7 +85,7 @@ const App = () => {
         )}
       </div>
       <div styleName="output-wave">
-        {/* <Oscilloscope value$={value$} /> */}
+        <Oscilloscope value$={value$} />
       </div>
       </div>
       }

@@ -80,6 +80,12 @@ export default class Loops {
   addMiddleware(middleware) {
     this.middlewares.push(middleware)
   }
+  
+  removeMiddleware(middleware) {
+    const index = this.middlewares.findIndex(middleware)
+
+    this.middlewares = [...this.middlewares.splice(0, index), ...this.middlewares.slice(index + 1)]
+  }
 
   tap() {
     this.tapTimestamps.push(Date.now())

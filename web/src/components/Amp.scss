@@ -1,13 +1,26 @@
 .container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 70px;
-    height: 70px;
-    background-color: lightblue;
-    border-radius: 5px;
+    padding: 10px 0 10px 0;
 
-    .button {
+
+    .effects {
+        display: flex;
+        flex-grow: 2;
+    }
+
+    .effect {
+        display: flex;
+        justify-content: space-between;
         cursor: pointer;
+        padding: 10px;
+        width: 129.44px;
+        height: 80px;
+        background-color: #add8e6;
+        border-radius: 10px;
+        &:not(:last-child) {
+            margin-right: 15px;
+        }
+        .title {
+            align-self: flex-end;
+        }
     }
 }

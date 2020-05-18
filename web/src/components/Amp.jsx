@@ -2,36 +2,55 @@ import React, {useRef, useEffect, useCallback, useState} from 'react'
 import {Amp} from '@loops/core'
 import {useDelay} from '@jsynth/core/modules'
 import {sampleRate} from '@loops/core'
+import Switch from '@material-ui/core/Switch'
 import './Amp.scss'
 
 export default ({loopsEngine, inputId}) => {
-    const [isOn, setIsOn] = useState(false)
+    const [isTubeOn, setIsOn] = useState(true)
+    const [isDelayOn, setIsDelayOn] = useState(true)
     const [amp] = useAmp(inputId)
     const [delayTransform, frequency, setFrequency] = useDelay(undefined, sampleRate)
 
     useEffect(() => {
       loopsEngine.addMiddleware(amp.getTransferFunction())
-      loopsEngine.addMiddleware(delayTransform)
     }, [])
 
-    const handleToggle = useCallback(() => {
-      setIsOn((isOn) => {
-        if (!isOn) {
-           //loopsEngine.addMiddleware(amp.getTransferFunction())
+    const handleAmpToggle = useCallback(() => {
+      setIsOn((isTubeOn) => {
+        if (!isTubeOn) {
+          loopsEngine.addMiddleware(amp.getTransferFunction())
         } else {
-          // remove
+          loopsEngine.removeMiddleware(amp.getTransferFunction())
+        }
+        return !isTubeOn
+      })
+    }, [isTubeOn, loopsEngine])
+
+    const handleDelayToggle = useCallback(() => {
+      setIsDelayOn((isOn) => {
+        if (!isDelayOn) {
+          loopsEngine.addMiddleware(delayTransform)
+        } else {
+          loopsEngine.removeMiddleware(delayTransform)
         }
         return !isOn
       })
-    }, [isOn])
+    }, [isDelayOn, loopsEngine])
 
     return (
       <div>
-      Amp
         <div styleName="container">
-          <div styleName="button" onClick={handleToggle}>
-            {isOn ? 'On' : 'Off'} 
+          <div styleName="effects">
+            <div styleName="effect">
+            <div styleName="title">Overdrive </div>
+              <Switch color="primary" checked={isTubeOn} onChange={setIsOn}/>
+            </div>
+            <div styleName="effect" >
+              <div styleName="title">Delay </div>
+              <Switch color="primary" checked={isDelayOn} onChange={handleDelayToggle} />
+            </div>
           </div>
+          
         </div>
       </div>
     )
