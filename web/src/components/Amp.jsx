@@ -1,14 +1,13 @@
 import React, {useRef, useEffect, useCallback, useState} from 'react'
 import {Amp} from '@loops/core'
 import {useDelay} from '@jsynth/core/modules'
-const delay = new Delay()
-
+import {sampleRate} from '@loops/core'
 import './Amp.scss'
 
 export default ({loopsEngine, inputId}) => {
     const [isOn, setIsOn] = useState(false)
     const [amp] = useAmp(inputId)
-    const [delayTransform, frequency, setFrequency] = useDelay()
+    const [delayTransform, frequency, setFrequency] = useDelay(undefined, sampleRate)
 
     useEffect(() => {
       loopsEngine.addMiddleware(amp.getTransferFunction())
@@ -18,7 +17,7 @@ export default ({loopsEngine, inputId}) => {
     const handleToggle = useCallback(() => {
       setIsOn((isOn) => {
         if (!isOn) {
-           loopsEngine.addMiddleware(amp.getTransferFunction())
+           //loopsEngine.addMiddleware(amp.getTransferFunction())
         } else {
           // remove
         }

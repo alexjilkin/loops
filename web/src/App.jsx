@@ -51,7 +51,6 @@ const App = () => {
     setIsPlaybackOn((isPlaybackOn) => {
       if (!isPlaybackOn) {
         loopsEngine.startMonitor()
-      
       } else {
         //loopsEngine.stopMonitor()
       }
@@ -63,7 +62,7 @@ const App = () => {
   return (
     <div styleName="container">
       <div styleName="button" onClick={handlePlayback}>
-          {isPlaybackOn ? 'On' : 'Off'} 
+          Playback {isPlaybackOn ? 'On' : 'Off'} 
       </div>
       <div style={{marginBottom: 20}}>
         <Amp loopsEngine={loopsEngine} inputId={lastInputId} />

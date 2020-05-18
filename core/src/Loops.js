@@ -55,7 +55,7 @@ export default class Loops {
 
       while (true) {
         const value = monitorBuffer[(index) % (monitorBufferSize)]
-        yield value ? middlewares.reduce((acc, func) => func(acc), value) : 0
+        yield value ? middlewares.reduce((acc, func) => func(acc, index), value) : 0
         index++;
       }
     }
