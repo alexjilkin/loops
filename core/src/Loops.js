@@ -69,7 +69,7 @@ export default class Loops {
     }
     await this.initRecording()
     this.stopCallback = await getBrowserInput(handleBuffer)
-    setTimeout(() => playFromGenerator(monitorGenerator(this.middlewares)), (bufferSize / sampleRate) * 1000)
+    setTimeout(() => playFromGenerator(monitorGenerator(this.middlewares)), (bufferSize / sampleRate) * 1)
   }
 
   initRecording() {
@@ -82,9 +82,11 @@ export default class Loops {
   }
   
   removeMiddleware(middleware) {
-    const index = this.middlewares.findIndex(middleware)
+    const index = this.middlewares.indexOf(middleware)
 
-    this.middlewares = [...this.middlewares.splice(0, index), ...this.middlewares.slice(index + 1)]
+    if (index !== -1) {
+      this.middlewares.splice(index, 1)
+    }
   }
 
   tap() {

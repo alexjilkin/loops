@@ -1,6 +1,6 @@
 const dist = 6
 const Q = -0.2
-const gain = 3;
+const gain = 8;
 const ePow =  Math.pow(Math.E, dist * Q)
 
 function transfer(value) {

@@ -7,7 +7,7 @@ import './Amp.scss'
 
 export default ({loopsEngine, inputId}) => {
     const [isTubeOn, setIsOn] = useState(true)
-    const [isDelayOn, setIsDelayOn] = useState(true)
+    const [isDelayOn, setIsDelayOn] = useState(false)
     const [amp] = useAmp(inputId)
     const [delayTransform, frequency, setFrequency] = useDelay(undefined, sampleRate)
 
@@ -24,7 +24,7 @@ export default ({loopsEngine, inputId}) => {
         }
         return !isTubeOn
       })
-    }, [isTubeOn, loopsEngine])
+   }, [isTubeOn, loopsEngine])
 
     const handleDelayToggle = useCallback(() => {
       setIsDelayOn((isOn) => {
@@ -43,7 +43,7 @@ export default ({loopsEngine, inputId}) => {
           <div styleName="effects">
             <div styleName="effect">
             <div styleName="title">Overdrive </div>
-              <Switch color="primary" checked={isTubeOn} onChange={setIsOn}/>
+              <Switch color="primary" checked={isTubeOn} onChange={handleAmpToggle}/>
             </div>
             <div styleName="effect" >
               <div styleName="title">Delay </div>
