@@ -1,6 +1,6 @@
 import React, {useRef, useEffect, useCallback, useState} from 'react'
 import {Amp} from '@loops/core'
-import {useDelay} from '@jsynth/core/modules'
+import {useDelay, useLowpass} from '@jsynth/core/modules'
 import {sampleRate} from '@loops/core'
 import Switch from '@material-ui/core/Switch'
 import './Amp.scss'
@@ -8,8 +8,11 @@ import './Amp.scss'
 export default ({loopsEngine, inputId}) => {
     const [isTubeOn, setIsOn] = useState(true)
     const [isDelayOn, setIsDelayOn] = useState(false)
+    const [isLowpassOn, setIsLowpassOn] = useState(false)
+
     const [amp] = useAmp(inputId)
-    const [delayTransform, frequency, setFrequency] = useDelay(undefined, sampleRate)
+    const [delayTransform, time, setTime, depth, setDepth, gain, setGain] = useDelay(undefined, sampleRate)
+    const [lowpassTransform, lowpassFrequency, setLowpassFrequency] = useLowpass(undefined, sampleRate)
 
     useEffect(() => {
       loopsEngine.addMiddleware(amp.getTransferFunction())
@@ -35,7 +38,19 @@ export default ({loopsEngine, inputId}) => {
         }
         return !isOn
       })
+
     }, [isDelayOn, loopsEngine])
+
+    const handleLowpassToggle = useCallback(() => {
+      setIsLowpassOn((isOn) => {
+        if (!isLowpassOn) {
+          loopsEngine.addMiddleware(lowpassTransform)
+        } else {
+          loopsEngine.removeMiddleware(lowpassTransform)
+        }
+        return !isOn
+      })
+    }, [isLowpassOn, loopsEngine])
 
     return (
       <div>
@@ -48,6 +63,10 @@ export default ({loopsEngine, inputId}) => {
             <div styleName="effect" >
               <div styleName="title">Delay </div>
               <Switch color="primary" checked={isDelayOn} onChange={handleDelayToggle} />
+            </div>
+            <div styleName="effect" >
+              <div styleName="title">Lowpass filter</div>
+              <Switch color="primary" checked={isLowpassOn} onChange={handleLowpassToggle} />
             </div>
           </div>
           
