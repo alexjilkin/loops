@@ -13,7 +13,7 @@ export const onTap$ = new Subject()
 export const value$ = new Subject()
 export const onNewLoop$ = new Subject()
 
-export const browserLoopPlay = (loop, bpm, transferFuncs) => {
+export const browserLoopPlay = (loop, bpm) => {
     const samplesPerTap = Math.floor(sampleRate * 60 / bpm)
 
     _loop = loop;
@@ -42,10 +42,9 @@ export const browserLoopPlay = (loop, bpm, transferFuncs) => {
                 break;
             }
 
-            const value = transferFuncs.reduce((acc, func) => func(acc), _loop[loopIndex])
-
-            value$.next(value)
+            const value = _loop[loopIndex]
             
+            value$.next(value)
             output[i] = value
         }
 

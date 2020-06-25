@@ -32,8 +32,10 @@ export default class Loops {
     this.loops[this.currentLoopIndex] = new Float32Array(sampleRate * 60)
 
     const handleBuffer = (inputBuffer) => {
-      const inputArray = new Float32Array(bufferSize)
+      let inputArray = new Float32Array(bufferSize)
       inputBuffer.copyFromChannel(inputArray, 0)
+
+      inputArray =  inputArray.map((y, x) => y ? this.middlewares.reduce((acc, func) => func(acc, x), y) : 0)
 
       this.loops[this.currentLoopIndex].set(inputArray, this.bufferCount * bufferSize)
       this.bufferCount++;

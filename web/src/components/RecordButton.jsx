@@ -10,7 +10,7 @@ const EightBitButton = ({loopsEngine, isRecording}) => {
         const tapsCount = loopsEngine.tap()
         buttonRef.current.focus()
         setTaps(tapsCount)
-    })
+    }, [loopsEngine])
 
     const handleClick = (e) => {
         // If its not keyboard
