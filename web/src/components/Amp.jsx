@@ -3,6 +3,7 @@ import {Amp} from '@loops/core'
 import {useDelay, useLowpass} from '@jsynth/core/modules'
 import {sampleRate} from '@loops/core'
 import Switch from '@material-ui/core/Switch'
+import Slider from '@material-ui/core/Switch'
 import './Amp.scss'
 
 export default ({loopsEngine, inputId}) => {

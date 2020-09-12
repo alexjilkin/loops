@@ -11,7 +11,6 @@ import Amp from './components/Amp'
 import './App.scss'
 const lastInputId = localStorage.getItem('inputId');
 
-
 const App = () => {
   const [isRecording, setIsRecording] = useState(null)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
@@ -24,9 +23,9 @@ const App = () => {
     clickAudioRef.current.currentTime = 0
 
     if (beatCount === 1) {
-      clickAudioRef.current.volume = 0.3
+      clickAudioRef.current.volume = 0.6
     } else {
-      clickAudioRef.current.volume = 0.1
+      clickAudioRef.current.volume = 0.4
     }
     
     clickAudioRef.current.play()
@@ -62,7 +61,7 @@ const App = () => {
   return (
     <div styleName="container">
       <div styleName="button" onClick={handlePlayback}>
-          Playback {isPlaybackOn ? 'On' : 'Off'} 
+          Turn Playback {isPlaybackOn ? 'Off' : 'On'} 
       </div>
       <div style={{marginBottom: 20}}>
         <Amp loopsEngine={loopsEngine} inputId={lastInputId} />
