@@ -80,7 +80,7 @@ const App = () => {
       </div>
       <div styleName="loops">
         {loops.map((loop, index) => 
-          <div key={index} styleName="loop"> {index} </div>
+          <div key={index} styleName="loop" onClick={() => loopsEngine.toggleLoop(index)}> {index} </div>
         )}
       </div>
       <div styleName="output-wave">

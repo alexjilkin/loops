@@ -1,7 +1,7 @@
 import {BehaviorSubject} from 'rxjs'
 import {first} from 'rxjs/operators'
-import {getBrowserInput, initBrowserInput} from './inputs'
-import {browserLoopPlay, updateLoop, onNewLoop$, onTap$, playFromGenerator} from './outputs'
+import {getBrowserInput, initBrowserInput, getSource} from './inputs'
+import {browserLoopPlay, setNextLoop, onNewLoop$, onTap$, playFromGenerator} from './outputs'
 import {sampleRate, bufferSize} from './consts'
 const weight = 4;
 
@@ -30,7 +30,7 @@ export default class Loops {
     this.currentLoopIndex = this.loops.length
     this.bufferCount = 0;
     this.loops[this.currentLoopIndex] = {
-      isPlaying: false,
+      isPlaying: true,
       data: new Float32Array(sampleRate * 60)
     }
 
@@ -154,22 +154,24 @@ export default class Loops {
     }
 
     this.loops$.next([...this.loops])
-    this.play()
+    this.updateLoop()
   }
 
-  play() {
-    let finalLoop = new Float32Array(this.maxLoopInSamples)
+  updateLoop() {
+    const finalLoopSize = Math.max(...(this.loops.filter(loop => loop.isPlaying).map(loop => loop.data.length)))
 
-    for (let i = 0; i < this.maxLoopInSamples; i++) {
+    let finalLoop = new Float32Array(finalLoopSize)
+
+    for (let i = 0; i < finalLoopSize; i++) {
       finalLoop[i] = 0;
 
-      this.loops.forEach(loop => {
+      this.loops.filter(loop => loop.isPlaying).forEach(loop => {
           finalLoop[i] += loop.data[i % loop.data.length] * 0.8
       })
     }
 
     if (this.isPlaying) {
-      updateLoop(finalLoop) 
+      setNextLoop(finalLoop) 
     } else {
       browserLoopPlay(finalLoop, this.bpm,  this.middlewares)
       this.isPlaying = true
@@ -187,8 +189,14 @@ export default class Loops {
   getLoops() {
     return this.loops$.asObservable()
   }
+
+  toggleLoop(index) {
+    this.loops[index].isPlaying = !this.loops[index].isPlaying;
+    this.updateLoop()
+  }
 }
 
+// Round loop to bars
 function normalizeLoop(loop, bpm, samplesCount) {
   const lengthInMinutes = (samplesCount / sampleRate) / 60;
   const lengthInBeats = Math.round(lengthInMinutes * bpm);

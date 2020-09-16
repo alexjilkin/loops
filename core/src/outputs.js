@@ -83,6 +83,6 @@ export const playFromGenerator = (generator) => {
     })
 }
 
-export const updateLoop = (nextLoop) => {
+export const setNextLoop = (nextLoop) => {
     _nextLoop = nextLoop
 }

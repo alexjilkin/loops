@@ -20,11 +20,17 @@ export const initBrowserInput = (deviceId) => {
 
             source.connect(processor);
             processor.connect(_recordContext.destination);
+
+            return _recordContext;
         })
+}
+
+export const getSource = () => {
+    return source
 }
 
 export const getBrowserInput = async (onAudio) => {
     processor.onaudioprocess = ({inputBuffer}) => onAudio(inputBuffer)
-
+    
     return () => _recordContext.close()
 }
