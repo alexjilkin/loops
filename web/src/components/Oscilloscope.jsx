@@ -1,8 +1,7 @@
 import React, {useEffect, useRef} from 'react';
-import { throttleTime } from 'rxjs/operators';
 
-const width = 300;
-const height = 200;
+const width = 700;
+const height = 300;
 const yUnit = height / 4;
 const xUnit = 2
 let lastX = 0;
@@ -29,7 +28,7 @@ const Oscilloscope = ({value$}) => {
                     context.clearRect(0, 0, width, height)
                     context.beginPath();
                     for (let x = 0; x < width; x++) {
-                        const canvasWorldX = x
+                        const canvasWorldX = x 
                         const canvasWorldY = (height * (3/5)) + (sample[x * 3] * yUnit)
                     
                         context.lineTo(canvasWorldX + xUnit, canvasWorldY);
