@@ -1,14 +1,17 @@
 import React, {useEffect, useRef} from 'react';
-import {throttleTime} from 'rxjs/operators';
-const width = 400;
-const height = 200;
-const yUnit = height / 1.5 ;
+import { throttleTime } from 'rxjs/operators';
 
+const width = 300;
+const height = 200;
+const yUnit = height / 4;
+const xUnit = 2
+let lastX = 0;
 let lastY = 0;
+
+let sample = []
 
 const Oscilloscope = ({value$}) => {
     const canvasRef = useRef(null)
-    let x = useRef(0)
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -16,23 +19,27 @@ const Oscilloscope = ({value$}) => {
         if (canvas.getContext) {
 
             const context = canvas.getContext('2d');
+            value$.subscribe((y) => {
 
-            value$.pipe(throttleTime(50)).subscribe((y) => {
-                const canvasWorldX = x.current % width;
-                const canvasWorldY = (height * (3/5)) + (y * yUnit)
+                sample.push(y)
 
-                if (canvasWorldX === 0) {
-                    context.beginPath();
+                if (sample.length > 1000) {
+                    
                     lastY = 0;
+                    context.clearRect(0, 0, width, height)
+                    context.beginPath();
+                    for (let x = 0; x < width; x++) {
+                        const canvasWorldX = x
+                        const canvasWorldY = (height * (3/5)) + (sample[x * 3] * yUnit)
+                    
+                        context.lineTo(canvasWorldX + xUnit, canvasWorldY);
+                        
+
+                        lastY = canvasWorldY;
+                    }
+                    context.stroke();
+                    sample = [];
                 }
-
-                context.clearRect(canvasWorldX + 2, 0, 2, height)
-                context.moveTo(canvasWorldX - 2, lastY);
-                context.lineTo(canvasWorldX, canvasWorldY);
-                context.stroke();
-
-                x.current = x.current + 2;
-                lastY = canvasWorldY;
             })
         }
         
