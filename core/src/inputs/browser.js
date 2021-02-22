@@ -1,3 +1,4 @@
+import {BehaviorSubject} from 'rxjs'
 import {sampleRate, bufferSize} from '../consts'
 let _recordContext
 

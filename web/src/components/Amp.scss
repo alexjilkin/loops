@@ -9,7 +9,7 @@
 
     .effect {
         display: flex;
-        justify-content: space-between;
+        flex-direction: column;
         cursor: pointer;
         padding: 10px;
         width: 129.44px;

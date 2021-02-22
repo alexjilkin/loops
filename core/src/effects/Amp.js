@@ -2,25 +2,47 @@ import {BehaviorSubject} from 'rxjs'
 
 const dist = 6
 const Q = -0.2
-const gain = 8;
-const ePow =  Math.pow(Math.E, dist * Q)
+let prevValue = 0;
 
 class Amp {
     constructor(inputDeviceId) {
       this.inputDeviceId = inputDeviceId
-      this.gain = gain
+      this.R$ = new BehaviorSubject(2.2)
+      this.R = 2.2
+
+      this.transfer = this.transfer.bind(this)
+      this.R$.subscribe(value => this.R = value)
     }
 
-    transfer(value) {
-      let x = value * gain;
-      if (x === Q || x === 0) {
-        return x
-      }  
-      return ((x - Q) / (1 - Math.pow(Math.E, (-1) * dist * (x - Q))) + (Q / (1 - ePow)))
+    transfer(y) {
+      let value = (y * 150)
+      if (y > 4.5) {
+          value = 4.5
+      } else if (y < -4.5){
+          value = -4.5
+      }
+      
+      value = prevValue + (this.circuit(prevValue, value))
+      prevValue = value;
+    
+      return value / 10
     }
 
     getTransferFunction() {
       return this.transfer
+    }
+
+    getR() {
+      return this.R$.asObservable()
+    }
+
+    setR(R) {
+      this.R$.next(R)
+    }
+    
+    
+    circuit(x, u) {
+      return ((u - x) / (this.R * 10)) - ((0.504) * Math.sinh(x / 45.3)) 
     }
  
 }

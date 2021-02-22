@@ -3,7 +3,7 @@ import {Amp} from '@loops/core'
 import {useDelay, useLowpass} from '@jsynth/core/modules'
 import {sampleRate} from '@loops/core'
 import Switch from '@material-ui/core/Switch'
-import Slider from '@material-ui/core/Switch'
+import Slider from '@material-ui/core/Slider'
 import './Amp.scss'
 
 export default ({loopsEngine, inputId}) => {
@@ -15,9 +15,14 @@ export default ({loopsEngine, inputId}) => {
     const [delayTransform, time, setTime, depth, setDepth, gain, setGain] = useDelay(undefined, sampleRate)
     const [lowpassTransform, lowpassFrequency, setLowpassFrequency] = useLowpass(undefined, sampleRate)
 
+    const [distortion, setDistortion] = useState(2.2)
     useEffect(() => {
       loopsEngine.addMiddleware(amp.getTransferFunction())
     }, [])
+
+    useEffect(() => {
+      amp.setR(distortion)
+    }, [distortion])
 
     const handleAmpToggle = useCallback(() => {
       setIsOn((isTubeOn) => {
@@ -59,7 +64,11 @@ export default ({loopsEngine, inputId}) => {
           <div styleName="effects">
             <div styleName="effect">
             <div styleName="title">Overdrive </div>
+           
+
+             
               <Switch color="primary" checked={isTubeOn} onChange={handleAmpToggle}/>
+              <Slider min={0.1} max={10} value={distortion} onChange={(e, v) => setDistortion(v)} aria-labelledby="continuous-slider" />
             </div>
             <div styleName="effect" >
               <div styleName="title">Delay </div>
