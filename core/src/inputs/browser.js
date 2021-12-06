@@ -14,6 +14,7 @@ export const initBrowserInput = (deviceId) => {
     
     return navigator.mediaDevices.getUserMedia({audio: {deviceId, sampleRate}, video: false })
         .then(stream => {
+            console.log(sampleRate)
             _recordContext = new AudioContext({sampleRate});
             source = _recordContext.createMediaStreamSource(stream);
             processor = _recordContext.createScriptProcessor(bufferSize, 1, 1);

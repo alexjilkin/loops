@@ -16,7 +16,7 @@ class Amp {
 
     transfer(y) {
 
-      let value = (y * 40)
+      let value = (y * 100)
 
       if (value > 4.5) {
           value = 4.5
@@ -27,7 +27,7 @@ class Amp {
       value = prevValue + (this.circuit(prevValue, value))
       prevValue = value;
     
-      return value / (20 / (this.R))
+      return value / (50 / (this.R))
     }
 
     getTransferFunction() {

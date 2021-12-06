@@ -31,7 +31,7 @@ export default class Loops {
     this.bufferCount = 0;
     this.loops[this.currentLoopIndex] = {
       isPlaying: true,
-      data: new Float32Array(sampleRate * 60)
+      data: new Float32Array(sampleRate * 30)
     }
 
     // const handleBuffer = (inputBuffer) => {
@@ -45,7 +45,7 @@ export default class Loops {
   }
 
   async startMonitor() {
-    const monitorBufferSize = bufferSize * 20 
+    const monitorBufferSize = bufferSize * 5 
 
     let monitorBuffer = new Float32Array(monitorBufferSize)
     let bufferCount = 0;
@@ -55,7 +55,7 @@ export default class Loops {
 
       while (true) {
         const value = monitorBuffer[(index) % (monitorBufferSize)]
-        yield middlewares.reduce((acc, func) => func(acc, index), value)
+        yield value
         index++;
       }
     }
@@ -63,18 +63,15 @@ export default class Loops {
     const handleBuffer = (inputBuffer) => {
       const inputArray = new Float32Array(bufferSize)
       inputBuffer.copyFromChannel(inputArray, 0)
-
-      monitorBuffer.set(inputArray, (bufferSize * bufferCount) % monitorBufferSize)
-      bufferCount++;
+      let res = inputArray.map((y, x) => this.middlewares.reduce((acc, func) => func(acc, (this.bufferCount * bufferSize) + x), y));
 
       if (this.isRecording) {
-        let inputArray = new Float32Array(bufferSize)
-        inputBuffer.copyFromChannel(inputArray, 0)
-        inputArray =  inputArray.map((y, x) => y ? this.middlewares.reduce((acc, func) => func(acc, (this.bufferCount * bufferSize) + x), y) : y)
-
-        this.loops[this.currentLoopIndex].data.set(inputArray, this.bufferCount * bufferSize)
+        this.loops[this.currentLoopIndex].data.set(res, this.bufferCount * bufferSize)
         this.bufferCount++;
       }
+
+      monitorBuffer.set(res, (bufferSize * bufferCount) % monitorBufferSize)
+      bufferCount++;
     }
 
     await initBrowserInput(this.inputDeviceId)
