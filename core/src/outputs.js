@@ -69,7 +69,11 @@ export const playFromGenerator = (generator) => {
 
     const createBuffer = (output) => {
         for (let i = 0; i < buffer.length; i++) {
-            let value = generator.next().value
+            let value;
+            while (!value) {
+                value = generator.next().value
+            }
+            
             value$.next(value)
             output[i] = value
         }

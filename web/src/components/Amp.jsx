@@ -68,7 +68,7 @@ export default ({loopsEngine, inputId}) => {
 
              
               <Switch color="primary" checked={isTubeOn} onChange={handleAmpToggle}/>
-              <Slider min={0.1} max={10} value={distortion} onChange={(e, v) => setDistortion(v)} aria-labelledby="continuous-slider" />
+              <Slider min={0.5} max={10} value={distortion} onChange={(e, v) => setDistortion(v)} aria-labelledby="continuous-slider" />
             </div>
             <div styleName="effect" >
               <div styleName="title">Delay </div>

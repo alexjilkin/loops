@@ -1,4 +1,3 @@
-import {BehaviorSubject} from 'rxjs'
 import {sampleRate, bufferSize} from '../consts'
 let _recordContext
 
@@ -30,7 +29,7 @@ export const getSource = () => {
     return source
 }
 
-export const getBrowserInput = async (onAudio) => {
+export const getBrowserInput = (onAudio) => {
     processor.onaudioprocess = ({inputBuffer}) => onAudio(inputBuffer)
     
     return () => _recordContext.close()

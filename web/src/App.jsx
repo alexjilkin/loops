@@ -51,7 +51,7 @@ const App = () => {
       if (!isPlaybackOn) {
         loopsEngine.startMonitor()
       } else {
-        //loopsEngine.stopMonitor()
+        loopsEngine.stopMonitor()
       }
 
       return !isPlaybackOn

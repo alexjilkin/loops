@@ -1,6 +1,6 @@
 import {BehaviorSubject} from 'rxjs'
 import {first} from 'rxjs/operators'
-import {getBrowserInput, initBrowserInput, getSource} from './inputs'
+import {getBrowserInput, initBrowserInput} from './inputs'
 import {browserLoopPlay, setNextLoop, onNewLoop$, onTap$, playFromGenerator} from './outputs'
 import {sampleRate, bufferSize} from './consts'
 const weight = 4;
@@ -34,19 +34,14 @@ export default class Loops {
       data: new Float32Array(sampleRate * 60)
     }
 
-    const handleBuffer = (inputBuffer) => {
-      let inputArray = new Float32Array(bufferSize)
-      inputBuffer.copyFromChannel(inputArray, 0)
-
-      inputArray =  inputArray.map((y, x) => y ? this.middlewares.reduce((acc, func) => func(acc, (this.bufferCount * bufferSize) + x), y) : 0)
-
-      this.loops[this.currentLoopIndex].data.set(inputArray, this.bufferCount * bufferSize)
-      this.bufferCount++;
-    };
+    // const handleBuffer = (inputBuffer) => {
+      
+    // };
 
     this.isRecording$.next(true);
-    await this.initRecording()
-    this.stopCallback = await getBrowserInput(handleBuffer)
+    // await this.initRecording()
+    // this.stopCallback = getBrowserInput(handleBuffer)
+    
   }
 
   async startMonitor() {
@@ -60,7 +55,7 @@ export default class Loops {
 
       while (true) {
         const value = monitorBuffer[(index) % (monitorBufferSize)]
-        yield value ? middlewares.reduce((acc, func) => func(acc, index), value) : 0
+        yield middlewares.reduce((acc, func) => func(acc, index), value)
         index++;
       }
     }
@@ -71,10 +66,24 @@ export default class Loops {
 
       monitorBuffer.set(inputArray, (bufferSize * bufferCount) % monitorBufferSize)
       bufferCount++;
+
+      if (this.isRecording) {
+        let inputArray = new Float32Array(bufferSize)
+        inputBuffer.copyFromChannel(inputArray, 0)
+        inputArray =  inputArray.map((y, x) => y ? this.middlewares.reduce((acc, func) => func(acc, (this.bufferCount * bufferSize) + x), y) : y)
+
+        this.loops[this.currentLoopIndex].data.set(inputArray, this.bufferCount * bufferSize)
+        this.bufferCount++;
+      }
     }
-    await this.initRecording()
-    this.stopCallback = await getBrowserInput(handleBuffer)
-    setTimeout(() => playFromGenerator(monitorGenerator(this.middlewares)), (bufferSize / sampleRate) * 1)
+
+    await initBrowserInput(this.inputDeviceId)
+    getBrowserInput(handleBuffer)
+    setTimeout(() => playFromGenerator(monitorGenerator(this.middlewares)), (bufferSize / sampleRate) * 1000)
+  }
+
+  stopMonitor() {
+    this.stopCallback()
   }
 
   initRecording() {
@@ -143,7 +152,7 @@ export default class Loops {
   }
 
   stop () {
-    this.stopCallback();
+ 
     const samplesCount = (this.bufferCount ) * bufferSize;
 
     this.loops[this.currentLoopIndex].data = normalizeLoop(this.loops[this.currentLoopIndex].data, this.bpm, samplesCount)
