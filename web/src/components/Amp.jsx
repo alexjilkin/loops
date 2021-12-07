@@ -12,7 +12,7 @@ export default ({loopsEngine, inputId}) => {
     const [isLowpassOn, setIsLowpassOn] = useState(false)
 
     const [amp] = useAmp(inputId)
-    const [delayTransform, time, setTime, depth, setDepth, gain, setGain] = useDelay(undefined, sampleRate)
+    const [delayTransform, time, setTime, depth, setDepth, gain, setGain] = useDelay({time: 0.2, depth: 5, gain: 0.5}, sampleRate)
     const [lowpassTransform, lowpassFrequency, setLowpassFrequency] = useLowpass(undefined, sampleRate)
 
     const [distortion, setDistortion] = useState(2.2)
@@ -63,16 +63,14 @@ export default ({loopsEngine, inputId}) => {
         <div styleName="container">
           <div styleName="effects">
             <div styleName="effect">
-            <div styleName="title">Overdrive </div>
-           
-
-             
+            <div styleName="title">Amp </div>
               <Switch color="primary" checked={isTubeOn} onChange={handleAmpToggle}/>
               <Slider min={0.5} max={10} value={distortion} onChange={(e, v) => setDistortion(v)} aria-labelledby="continuous-slider" />
             </div>
             <div styleName="effect" >
               <div styleName="title">Delay </div>
               <Switch color="primary" checked={isDelayOn} onChange={handleDelayToggle} />
+              <Slider step={0.1} min={0.1} max={2} value={time} onChange={(e, v) => setTime(v)} aria-labelledby="continuous-slider" />
             </div>
             <div styleName="effect" >
               <div styleName="title">Lowpass filter</div>
@@ -84,7 +82,6 @@ export default ({loopsEngine, inputId}) => {
       </div>
     )
 }
-
 
 const useAmp = (inputId) => {
   const amp = useRef(new Amp(inputId))

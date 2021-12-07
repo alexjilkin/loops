@@ -22,18 +22,18 @@ const EightBitButton = ({loopsEngine, isRecording}) => {
     useKeyboard(handleTap)
 
     return (
-        <>
-        <button ref={buttonRef} onClick={handleClick} styleName={`button ${isRecording ? 'stop' : ''}`}> 
-          {isRecording ? 'Stop ' : 'Tap '}
-        </button>
-        <div styleName="taps">
-          {
-            Array.from({length: taps}).map((v, i) => (
-              <div key={i} styleName="tap"></div>
-            )) 
-          }
+        <div styleName="container">
+          <button ref={buttonRef} onClick={handleClick} styleName={`button ${isRecording ? 'stop' : ''}`}> 
+            {isRecording ? 'Stop ' : 'Tap '}
+          </button>
+          <div styleName="taps">
+            {
+              Array.from({length: taps}).map((v, i) => (
+                <div key={i} styleName="tap"></div>
+              )) 
+            }
+          </div>
         </div>
-        </>
     )
 }
 

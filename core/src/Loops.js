@@ -11,7 +11,7 @@ export default class Loops {
     this.loops = []
     this.tapTimestamps = []
     this.bpm = 0
-    this.bufferCount = 0
+    this.loopBufferCount = 0
     this.currentLoopIndex = 0
     this.isRecording = false
     this.isPlaying = false
@@ -28,20 +28,13 @@ export default class Loops {
 
   async startRecording() {
     this.currentLoopIndex = this.loops.length
-    this.bufferCount = 0;
+    this.loopBufferCount = 0;
     this.loops[this.currentLoopIndex] = {
       isPlaying: true,
       data: new Float32Array(sampleRate * 30)
     }
 
-    // const handleBuffer = (inputBuffer) => {
-      
-    // };
-
     this.isRecording$.next(true);
-    // await this.initRecording()
-    // this.stopCallback = getBrowserInput(handleBuffer)
-    
   }
 
   async startMonitor() {
@@ -50,7 +43,7 @@ export default class Loops {
     let monitorBuffer = new Float32Array(monitorBufferSize)
     let bufferCount = 0;
     
-    function* monitorGenerator(middlewares) {
+    function* monitorGenerator() {
       let index = 0;
 
       while (true) {
@@ -63,11 +56,11 @@ export default class Loops {
     const handleBuffer = (inputBuffer) => {
       const inputArray = new Float32Array(bufferSize)
       inputBuffer.copyFromChannel(inputArray, 0)
-      let res = inputArray.map((y, x) => this.middlewares.reduce((acc, func) => func(acc, (this.bufferCount * bufferSize) + x), y));
+      let res = inputArray.map((y, x) => this.middlewares.reduce((acc, func) => func(acc, (bufferCount * bufferSize) + x), y));
 
       if (this.isRecording) {
-        this.loops[this.currentLoopIndex].data.set(res, this.bufferCount * bufferSize)
-        this.bufferCount++;
+        this.loops[this.currentLoopIndex].data.set(res, this.loopBufferCount * bufferSize)
+        this.loopBufferCount++;
       }
 
       monitorBuffer.set(res, (bufferSize * bufferCount) % monitorBufferSize)
@@ -149,8 +142,7 @@ export default class Loops {
   }
 
   stop () {
- 
-    const samplesCount = (this.bufferCount ) * bufferSize;
+    const samplesCount = (this.loopBufferCount ) * bufferSize;
 
     this.loops[this.currentLoopIndex].data = normalizeLoop(this.loops[this.currentLoopIndex].data, this.bpm, samplesCount)
     const loopSizeInSamples = this.loops[this.currentLoopIndex].data.length
@@ -164,7 +156,9 @@ export default class Loops {
   }
 
   updateLoop() {
-    const finalLoopSize = Math.max(...(this.loops.filter(loop => loop.isPlaying).map(loop => loop.data.length)))
+    const finalLoopSize = this.loops.length === 1 
+      ? this.loops[0].data.length 
+      : Math.max(...(this.loops.filter(loop => loop.isPlaying).map(loop => loop.data.length)))
 
     let finalLoop = new Float32Array(finalLoopSize)
 
@@ -216,5 +210,5 @@ function normalizeLoop(loop, bpm, samplesCount) {
 
   const loopSizeInSamples = Math.floor(((lengthInBars * weight) / bpm ) * 60 * sampleRate)
   
-   return loop.slice(bufferSize, loopSizeInSamples)
+  return loop.slice(bufferSize, loopSizeInSamples)
 }

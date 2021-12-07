@@ -12,6 +12,10 @@ $reset-button-background: #E76E55;
 $reset-sec-button-background: #CE372B;
 $reset-shadow-color:  #8C2022;
 
+.container {
+    display: flex;
+    flex-direction: column;
+}
 .button {
     background: $button-background;
     position: relative;

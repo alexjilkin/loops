@@ -1,9 +1,9 @@
 import React, {useEffect, useRef} from 'react';
 
-const width = 700;
-const height = 300;
-const yUnit = height / 4;
-const xUnit = 2
+const width = 300;
+const height = 150;
+const yUnit = height / 7;
+const xUnit = 1
 let lastX = 0;
 let lastY = 0;
 
@@ -21,9 +21,7 @@ const Oscilloscope = ({value$}) => {
             value$.subscribe((y) => {
 
                 sample.push(y)
-
                 if (sample.length > 1000) {
-                    
                     lastY = 0;
                     context.clearRect(0, 0, width, height)
                     context.beginPath();

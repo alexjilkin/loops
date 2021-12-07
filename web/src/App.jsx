@@ -1,5 +1,5 @@
-import React, {useState, useCallback, useEffect, useRef} from 'react';
-import {value$} from '@loops/core'
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { value$ } from '@loops/core'
 import Oscilloscope from './components/Oscilloscope'
 import Settings from './components/Settings';
 import RecordButton from './components/RecordButton'
@@ -15,7 +15,7 @@ const App = () => {
   const [isRecording, setIsRecording] = useState(null)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [bpm, setBpm] = useState(null)
-  const [isPlaybackOn, setIsPlaybackOn] = useState(false)
+  const [isOn, setIsOn] = useState(false)
 
   const clickAudioRef = useRef(null)
 
@@ -27,19 +27,19 @@ const App = () => {
     } else {
       clickAudioRef.current.volume = 0.4
     }
-    
+
     clickAudioRef.current.play()
   }
-  
+
   const [loopsEngine, loops] = useLoops(playTap, setBpm)
 
   useEffect(() => {
     loopsEngine.isRecording$.subscribe(setIsRecording)
-    
+
     if (lastInputId) {
       loopsEngine.setInput(lastInputId)
     }
-    
+
   }, [])
 
   const handleSettingsClick = useCallback(() => {
@@ -47,48 +47,55 @@ const App = () => {
   }, [isSettingsOpen])
 
   const handlePlayback = useCallback(() => {
-    setIsPlaybackOn((isPlaybackOn) => {
-      if (!isPlaybackOn) {
+    setIsOn((isOn) => {
+      if (!isOn) {
         loopsEngine.startMonitor()
       } else {
         loopsEngine.stopMonitor()
       }
 
-      return !isPlaybackOn
+      return !isOn
     })
-  }, [isPlaybackOn])
+  }, [isOn])
 
   return (
     <div styleName="container">
-      <div styleName="button" onClick={handlePlayback}>
-          Turn Playback {isPlaybackOn ? 'Off' : 'On'} 
+      <div styleName="left-column">
+        
+        <span styleName={`turn-on ${isOn ? 'on' : ''}`} onClick={handlePlayback}>
+          Turn On
+        </span>
+        
+        <div>
+          <Amp loopsEngine={loopsEngine} inputId={lastInputId} />
+        </div>
+        <audio src={Click} ref={clickAudioRef}></audio>
+        <div styleName="settings" onClick={handleSettingsClick}>
+          <img src={CogIcon} />
+        </div>
+        {!isOn 
+          ? null 
+          : isSettingsOpen
+          ? <Settings loopsEngine={loopsEngine} onSettingsToggle={handleSettingsClick} /> 
+          : <div>
+              <div styleName="record-button-container">
+                <RecordButton loopsEngine={loopsEngine} isRecording={isRecording} />
+                <div styleName="bpm">
+                  {bpm && `${bpm} bpm`}
+                </div>
+              </div>
+              
+              <div styleName="output-wave">
+                <Oscilloscope value$={value$} />
+              </div>
+            </div>
+        }
       </div>
-      <div style={{marginBottom: 20}}>
-        <Amp loopsEngine={loopsEngine} inputId={lastInputId} />
-      </div>
-      <audio src={Click} ref={clickAudioRef}></audio>
-      <div styleName="settings" onClick={handleSettingsClick}>
-        <img src={CogIcon} />
-      </div>
-      {isSettingsOpen ? 
-        <Settings loopsEngine={loopsEngine} onSettingsToggle={handleSettingsClick}/> :
-      <div>
-
-      <RecordButton loopsEngine={loopsEngine} isRecording={isRecording} />
-      <div styleName="bpm">
-        {bpm && `BPM: ${bpm}`}
-      </div>
-      <div styleName="loops">
-        {loops.map((loop, index) => 
-          <div key={index} styleName="loop" onClick={() => loopsEngine.toggleLoop(index)}> {index} </div>
+      <div styleName="loops right-column">
+        {loops.map((loop, index) =>
+          <div key={index} style={{width: loop.data.length / 1000}} styleName="loop" onClick={() => loopsEngine.toggleLoop(index)}> {index + 1} </div>
         )}
       </div>
-      <div styleName="output-wave">
-        <Oscilloscope value$={value$} />
-      </div>
-      </div>
-      }
-
     </div>
   );
 }
