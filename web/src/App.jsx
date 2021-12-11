@@ -23,9 +23,9 @@ const App = () => {
     clickAudioRef.current.currentTime = 0
 
     if (beatCount === 1) {
-      clickAudioRef.current.volume = 0.6
+      clickAudioRef.current.volume = 0.7
     } else {
-      clickAudioRef.current.volume = 0.4
+      clickAudioRef.current.volume = 0.3
     }
 
     clickAudioRef.current.play()
@@ -91,9 +91,16 @@ const App = () => {
             </div>
         }
       </div>
-      <div styleName="loops right-column">
+      <div styleName="loops">
         {loops.map((loop, index) =>
-          <div key={index} style={{width: loop.data.length / 1000}} styleName="loop" onClick={() => loopsEngine.toggleLoop(index)}> {index + 1} </div>
+          <div 
+            key={index} 
+            style={{width: loop.data.length / 1000}} 
+            styleName={`loop ${loop.isPlaying ? '' : 'disabled'}`}
+            onClick={() => loopsEngine.toggleLoop(index)}
+          > 
+            {index + 1}
+          </div>
         )}
       </div>
     </div>

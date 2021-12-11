@@ -12,7 +12,7 @@ const useKeyboard = (onSpace) => {
       const handleKeyboard = (e) => {
         document.removeEventListener('keydown', handleKeyboard)
     
-        if(event.code === 'Space') {
+        if(e.code === 'Space') {
           onSpace()
         }
       }

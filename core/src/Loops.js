@@ -94,20 +94,28 @@ export default class Loops {
   }
 
   tap() {
+    let isInserting = false;
     this.tapTimestamps.push(Date.now())
     
     if (this.isRecording) {
       this.stop()
       this.isRecording$.next(false);
+
       return 0;
+    // Insert another loop
     } else if (this.bpm) {
-      onNewLoop$.pipe(first()).subscribe(() => {
-        this.startRecording()
-        this.onStartRecord && this.onStartRecord(this.bpm)
-        console.log('New recording')
-      })
-      
-      return 0;
+      if (!isInserting) {
+        isInserting = true;
+
+        onNewLoop$.pipe(first()).subscribe(() => {
+          this.startRecording()
+          this.onStartRecord && this.onStartRecord(this.bpm)
+          
+          console.log('New recording')
+        })
+      }
+
+      return 0
     } else if (this.tapTimestamps.length === weight) {
       
       let sumIntervals = 0;
@@ -191,7 +199,13 @@ export default class Loops {
   }
 
   toggleLoop(index) {
-    this.loops[index].isPlaying = !this.loops[index].isPlaying;
+    const loop = this.loops[index];
+    this.loops[index] = {
+      ...this.loops[index],
+      isPlaying: !loop.isPlaying 
+    }
+    this.loops$.next([...this.loops])
+
     this.updateLoop()
   }
 }

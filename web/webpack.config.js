@@ -3,7 +3,7 @@ const webpack = require('webpack');
 const path = require('path');
 const context = path.resolve(__dirname, 'src');
 
-module.exports = {
+module.exports = (env, argv) => ({
   entry: [
     'react-hot-loader/patch',
     './index.js'
@@ -18,7 +18,7 @@ module.exports = {
             loader: 'url-loader',
             options: {
               limit: 8192,
-              publicPath:  process.env.NODE_ENV === 'development' ? '' : '/loops'
+              publicPath:  argv.mode === 'development' ? '' : '/loops'
             },
           },
         ],
@@ -91,4 +91,4 @@ module.exports = {
     hot: true,
     historyApiFallback: true
   }
-};
+})

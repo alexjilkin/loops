@@ -19,13 +19,11 @@
 	display: flex;
 }
 
-.right-column {
-	padding: 4em;
-}
 
 .loops {
 	display: flex;
 	flex-direction: column;
+	padding: 6.2em 0 0 1em;
 
 	.loop {
 		cursor: pointer;
@@ -37,8 +35,12 @@
 		background-color: lightcoral;
 		margin: 0.2em;
 
+		&.disabled {
+			filter: brightness(60%);
+		}
+
 		&:hover {
-			filter: brightness(80%);
+			filter: brightness(110%);
 		}
 	}
 }

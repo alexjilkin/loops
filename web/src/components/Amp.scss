@@ -1,6 +1,5 @@
 .container {
-    padding: 10px 0 10px 0;
-
+    padding: 1em 0 1em 0;
 
     .effects {
         display: flex;
@@ -16,6 +15,7 @@
         height: 80px;
         background-color: #add8e6;
         border-radius: 10px;
+
         &:not(:last-child) {
             margin-right: 15px;
         }
