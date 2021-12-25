@@ -15,13 +15,12 @@
   "bugs": {
     "url": "https://github.com/alexjilkin/looper/issues"
   },
-  "dependencies": {
-
-  },
-  "devDependencies": {
-
-  },
+  "dependencies": {},
+  "devDependencies": {},
   "private": true,
-  "workspaces": ["core", "web"],
+  "workspaces": [
+    "core",
+    "web"
+  ],
   "homepage": "https://github.com/alexjilkin/looper#readme"
 }
