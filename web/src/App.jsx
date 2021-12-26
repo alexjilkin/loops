@@ -80,9 +80,9 @@ const App = () => {
           <img src={CogIcon} />
         </div>
         {!isOn 
-          ? null 
-          : isSettingsOpen
-          ? <Settings loopsEngine={loopsEngine} onSettingsToggle={handleSettingsClick} /> 
+          ? isSettingsOpen
+            ? <Settings loopsEngine={loopsEngine} onSettingsToggle={handleSettingsClick} />  
+            : null
           : <div>
               <div styleName="record-button-container">
                 <RecordButton loopsEngine={loopsEngine} isRecording={isRecording} />
