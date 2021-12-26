@@ -47,6 +47,12 @@ const App = () => {
   }, [isSettingsOpen])
 
   const handlePlayback = useCallback(() => {
+    try {
+      _paq.push(['trackEvent', 'Looper', 'On']);
+    } catch {
+      console.log('Failed to track')
+    }
+    
     setIsOn((isOn) => {
       if (!isOn) {
         loopsEngine.startMonitor()
