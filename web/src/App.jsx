@@ -7,6 +7,7 @@ import Click from './assets/korg-click.wav'
 import CogIcon from './assets/cog.svg'
 import useLoops from './hooks/useLoops'
 import Amp from './components/Amp'
+import {track} from './infra/track'
 
 import './App.scss'
 const lastInputId = localStorage.getItem('inputId');
@@ -47,11 +48,7 @@ const App = () => {
   }, [isSettingsOpen])
 
   const handlePlayback = useCallback(() => {
-    try {
-      _paq.push(['trackEvent', 'Looper', 'On']);
-    } catch {
-      console.log('Failed to track')
-    }
+    track('turn on')
     
     setIsOn((isOn) => {
       if (!isOn) {
